@@ -16,7 +16,7 @@ Most components and tools are built with flexibility in mind, providing a balanc
 
 But some will have its constrains, planting itself deep into how your project structures.
 
-This is not required, but to fully utilize this package, your project should already using `react-router`, `lenis`, `motion` and `@react-three/*`.
+This is not required, but to fully utilize this package, your project should already using `react-router`, `lenis` and `@react-three/*`.
 
 > [!NOTE]
 > `React v19+` is required.
