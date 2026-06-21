@@ -3,7 +3,7 @@
 An in-house core package by neveranyart for making performant React CSR.
 
 > [!WARNING]
-> The package is still in active development with many changes between is each releases to cover more cases.
+> The package is still in active development with many changes between each releases to cover more cases.
 > 
 > So before version 1.0.0 is released, no migration guide will be provided.
 > 
