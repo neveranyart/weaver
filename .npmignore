@@ -1,0 +1,12 @@
+src/
+node_modules/
+.yarn/
+.vscode/
+tsconfig.json
+.editorconfig
+.gitattributes
+.prettierignore
+.prettierrc
+.yarnrc.yml
+eslint.config.js
+tsconfig.json
