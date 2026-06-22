@@ -1,4 +1,4 @@
-# Weaver
+<img width="2532" height="1470" alt="title card" src="https://github.com/user-attachments/assets/3e8540a8-1e36-47da-9510-774b52a2f199" />
 
 An in-house core package by neveranyart for making performant React CSR.
 
