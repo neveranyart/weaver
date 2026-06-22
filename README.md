@@ -37,4 +37,4 @@ npm i @neveranyart/weaver
 3. [Hooks](https://github.com/neveranyart/weaver/blob/main/docs/HOOKS.md)
 
 ## License
-LGPL-3.0-or-later
+LGPL-2.1-or-later

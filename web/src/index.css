@@ -1,0 +1,82 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi/Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi/VariableItalic.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'CDAIndependence';
+  src: url('/fonts/CDAIndependence/Variable.ttf') format('truetype');
+  font-weight: 300 900;
+  font-display: swap;
+}
+
+html {
+  font-family: 'Satoshi', 'Calibri';
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+  -ms-overflow-style: none;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+*::selection {
+  background: #4a4a48;
+  color: #fcfcf6;
+}
+*::-moz-selection {
+  background: #4a4a48;
+  color: #fcfcf6;
+}
+*::-webkit-selection {
+  background: #4a4a48;
+  color: #fcfcf6;
+}
+
+@layer components {
+  .scene-navbar {
+    z-index: 90;
+  }
+
+  .scene-overflow {
+    z-index: 80;
+  }
+
+  .scene-fallback {
+    z-index: 70;
+  }
+
+  .scene-over {
+    z-index: 60;
+  }
+
+  .scene-behind {
+    z-index: 40;
+  }
+}
