@@ -3,7 +3,7 @@ import { BakeScene } from '@neveranyart/weaver/scene';
 import { PerspectiveCamera } from '@react-three/drei';
 import { useState } from 'react';
 
-export default function Home() {
+export default function Depth() {
   const [sceneReady, setSceneReady] = useState(false);
 
   return (
