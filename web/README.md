@@ -2,7 +2,7 @@
 A simple page to display the capabilities of the package.
 
 ## Font used
-- [CDA Independence 🇻🇳](https://collectivedesign.agency/work/cda-independence)
+- [Playfair Display](https://fonts.google.com/specimen/Playfair+Display)
 - [Satoshi](https://fontshare.com/fonts/satoshi)
 
 ## License

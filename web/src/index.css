@@ -1,30 +1,61 @@
 @import 'tailwindcss';
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi/Variable.woff2') format('woff2');
-  font-weight: 300 900;
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer/Variable.woff2') format('woff2');
+  font-weight: 100 900;
   font-display: swap;
-  font-style: normal;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi/VariableItalic.woff2') format('woff2');
-  font-weight: 300 900;
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer/VariableItalic.woff2') format('woff2');
+  font-weight: 100 900;
   font-display: swap;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'CDAIndependence';
-  src: url('/fonts/CDAIndependence/Variable.ttf') format('truetype');
-  font-weight: 300 900;
+  font-family: 'PlayfairDisplay';
+  src: url('/fonts/PlayfairDisplay/Variable.ttf') format('truetype');
+  font-weight: 400 900;
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'PlayfairDisplay';
+  src: url('/fonts/PlayfairDisplay/VariableItalic.ttf') format('truetype');
+  font-weight: 400 900;
+  font-display: swap;
+  font-style: italic;
+}
+
+@utility trim {
+  text-box: trim-both cap alphabetic;
+}
+
+@utility trim-cap {
+  text-box: trim-both cap alphabetic;
+}
+
+@utility trim-ex {
+  text-box: trim-both ex alphabetic;
+}
+
+@utility trim-none {
+  text-box-trim: none;
+}
+
+@utility trim-start {
+  text-box-trim: trim-start;
+}
+
+@utility trim-end {
+  text-box-trim: trim-end;
+}
+
 html {
-  font-family: 'Satoshi', 'Calibri';
+  font-family: 'Switzer', 'Calibri';
   overflow-y: scroll;
   overflow-x: hidden;
 }
