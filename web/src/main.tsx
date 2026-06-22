@@ -45,7 +45,7 @@ const router = createBrowserRouter([
             <Depth />
           </Suspense>
         ),
-        handle: { identifier: 'depth' },
+        handle: { identifier: 'Depth' },
       },
     ],
   },
