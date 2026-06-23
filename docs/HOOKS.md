@@ -18,6 +18,7 @@ Any hooks that doesn't require external packages imported will lives in `/hooks`
 ## External packages hooks
 Hooks that require a, or many external packages to be installed.
 
+- [`useWeaverRouting`](https://github.com/neveranyart/weaver/blob/main/src/routing/hooks/weaverRouting.ts) ⚹ `react-router` specific. A hook to know what stage of the navigation transition is currently in, crucial for your page transition.
 - [`useViewport`](https://github.com/neveranyart/weaver/blob/main/src/scene/hooks/viewport.ts) ⚹ `@react-three/fiber` specific. State change when camera or screen size changes with the actual measurements.
 - [`useNavigateAnchor`](https://github.com/neveranyart/weaver/blob/main/src/routing/hooks/navigateAnchor.ts) ⚹ `react-router` specific. A hook to allow custom `<Link />` replacement with navigation event support.
 - [`useRawParams`](https://github.com/neveranyart/weaver/blob/main/src/routing/hooks/rawParams.ts) ⚹ `react-router` specific. Updates and splits pathname on location change.
