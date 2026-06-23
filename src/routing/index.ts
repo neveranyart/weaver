@@ -5,12 +5,12 @@ import { useNavigateAnchor } from './hooks/navigateAnchor';
 import { useRawParams } from './hooks/rawParams';
 
 /// A read-only state for reacting with changes reflected by weaver.
-export const useWeaverRoutingState = (
-  givenState: keyof WeaverRoutingContextGetter
-) => {
+export function useWeaverRoutingState<
+  K extends keyof WeaverRoutingContextGetter,
+>(givenState: K): WeaverRoutingContextGetter[K] {
   const state = useWeaverRoutingContext((state) => state[givenState]);
   return state;
-};
+}
 
 export { useNavigateAnchor, useRawParams };
 
