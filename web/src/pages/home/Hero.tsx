@@ -3,7 +3,7 @@ import { SceneSync } from '@neveranyart/weaver/scene';
 import { animate } from 'motion';
 import { motion } from 'motion/react';
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
-import { Mesh, MeshBasicMaterial, Path, Shape } from 'three';
+import { Mesh, Path, Shape } from 'three';
 import NeveranyLogo from './NeveranyLogo';
 
 export default function Hero() {
@@ -48,34 +48,36 @@ function AnimatedCylinder(props: { index: number }) {
 
   useLayoutEffect(() => {
     if (!pageRendered) return;
-    animate(0, 1, {
-      onUpdate(latest) {
-        if (!mesh.current) return;
-        mesh.current.rotation.y = Math.PI / 2 + props.index * (Math.PI / 2 / 4) * latest;
-      },
-      delay: 0.5 + props.index * 0.05,
-      duration: 1,
-      ease: [1, 0, 0, 1],
-    });
+    if (!mesh.current) return;
 
-    animate(1 * (props.index + 1), -0.2, {
-      onUpdate(latest) {
-        if (!mesh.current) return;
-        mesh.current.position.x = latest;
-      },
-      delay: 0.7 + props.index * 0.025,
-      duration: 0.5,
-      ease: [1, 0, 0, 1],
-    });
+    animate(
+      mesh.current.rotation,
+      { y: Math.PI / 2 + props.index * (Math.PI / 2 / 4) },
+      {
+        delay: 0.5 + props.index * 0.05,
+        duration: 1,
+        ease: [1, 0, 0, 1],
+      }
+    );
 
-    animate(0, 1, {
-      onUpdate(latest) {
-        if (!mesh.current) return;
-        (mesh.current.material as MeshBasicMaterial).opacity = latest;
-      },
-      delay: 0.9 + props.index * 0.1,
-      duration: 0,
-    });
+    animate(
+      mesh.current.position,
+      { x: -0.2 },
+      {
+        delay: 0.7 + props.index * 0.025,
+        duration: 0.5,
+        ease: [1, 0, 0, 1],
+      }
+    );
+
+    animate(
+      mesh.current.material,
+      { opacity: 1 },
+      {
+        delay: 0.9 + props.index * 0.1,
+        duration: 0,
+      }
+    );
   }, [pageRendered]);
 
   const arcShape = useMemo(() => {
@@ -88,7 +90,11 @@ function AnimatedCylinder(props: { index: number }) {
   }, []);
 
   return (
-    <mesh ref={mesh}>
+    <mesh
+      ref={mesh}
+      rotation={[0, Math.PI / 2, 0]}
+      position={[1 * (props.index + 1) * 0.5, 0, 0]}
+    >
       <extrudeGeometry
         args={[
           arcShape,
@@ -99,7 +105,7 @@ function AnimatedCylinder(props: { index: number }) {
             depth: 0.4,
           },
         ]}
-      ></extrudeGeometry>
+      />
       <meshBasicMaterial
         color={props.index % 2 ? '#757575' : '#2b2b2b'}
         wireframe={!!(props.index % 2)}
