@@ -1,4 +1,4 @@
-<img width="2000" height="1320" alt="title card" src="https://github.com/user-attachments/assets/21e54348-fda8-4ac1-a426-8be13efe1919" />
+<img width="1952" height="1343" alt="weaver" src="https://github.com/user-attachments/assets/b2393f6a-2e51-4678-a1f5-e6867f848181" />
 
 An in-house core package with many fun, little tools by neveranyart for making performant React CSR websites.
 
