@@ -1,17 +1,9 @@
 import DelayedOutlet from './components/DelayedOutlet';
 import Pipeline from './components/Pipeline';
-import { useWeaverRoutingContext, WeaverRoutingContextGetter } from './context';
 import { useNavigateAnchor } from './hooks/navigateAnchor';
 import { useRawParams } from './hooks/rawParams';
+import { useWeaverRouting } from './hooks/weaverRouting';
 
-/// A read-only state for reacting with changes reflected by weaver.
-export function useWeaverRoutingState<
-  K extends keyof WeaverRoutingContextGetter,
->(givenState: K): WeaverRoutingContextGetter[K] {
-  const state = useWeaverRoutingContext((state) => state[givenState]);
-  return state;
-}
-
-export { useNavigateAnchor, useRawParams };
+export { useNavigateAnchor, useRawParams, useWeaverRouting };
 
 export { DelayedOutlet, Pipeline };
