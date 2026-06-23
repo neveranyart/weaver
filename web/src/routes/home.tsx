@@ -1,6 +1,6 @@
 import { Pipeline } from '@neveranyart/weaver/routing';
 import { BakeScene } from '@neveranyart/weaver/scene';
-import { PerspectiveCamera } from '@react-three/drei';
+import { OrthographicCamera } from '@react-three/drei';
 import { useState } from 'react';
 import Hero from '../pages/home/Hero';
 import Weave from '../pages/home/Weave';
@@ -15,17 +15,13 @@ export default function Home() {
       identifier="Home"
       contentReady={sceneReady}
     >
-      {sceneReady && (
-        <>
-          <Weave />
-          <Hero />
-        </>
-      )}
+      <Weave />
+      <Hero />
       <BakeScene
         onSceneReady={() => setSceneReady(true)}
         sceneKey="homeSceneObjs"
       >
-        <PerspectiveCamera makeDefault position={[0, 0, 5]} />
+        <OrthographicCamera makeDefault position={[0, 0, 5]} zoom={100} />
       </BakeScene>
     </Pipeline>
   );
