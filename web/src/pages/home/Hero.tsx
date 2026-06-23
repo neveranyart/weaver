@@ -58,7 +58,7 @@ function AnimatedCylinder(props: { index: number }) {
       ease: [1, 0, 0, 1],
     });
 
-    animate(1, -0.2, {
+    animate(1 * (props.index + 1), -0.2, {
       onUpdate(latest) {
         if (!mesh.current) return;
         mesh.current.position.x = latest;
