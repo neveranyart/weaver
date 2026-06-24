@@ -29,6 +29,13 @@ export type Basic3DTransforms = {
 
 interface SyncProps {
   /**
+   * This key is used for your objects passed into R3F.
+   *
+   * The components will be passed into the same tunnel, so the key here must be unique across pages.
+   */
+  sceneKey: string;
+
+  /**
    * HTML element ref that `<SceneSync />` will use to sync with the scene.
    *
    * ```tsx
@@ -39,79 +46,6 @@ interface SyncProps {
    * ```
    */
   attach: RefObject<HTMLElement | null>;
-
-  /**
-   * This variable allows fine-grain control over your scene when passed to `<SceneSync />`.
-   *
-   * `<SceneSync />` will use its own ref and group when creating your scene to control its scale and position.
-   * Setting this variable will disable the internal ref, and you can decide on which object gets controlled.
-   *
-   * This variable is needed for `hud` if you wanted to add a custom camera.
-   *
-   * For listening to change details, use `onLayoutChange` instead.
-   */
-  control?: RefObject<Basic3DTransforms | null>;
-
-  /**
-   * When this variable is set, `<SceneSync />` will send updates when the scene update its positions.
-   *
-   * The function return the calculated DOM rect, with dimension and position in 3D measurements.
-   */
-  onLayoutUpdate?: (
-    rect: DOMRect,
-    dimension: { w: number; h: number },
-    position: { x: number; y: number }
-  ) => void;
-
-  /**
-   * Use `Hud` for this scene or not.
-   *
-   * This is useful when you want to apply custom camera for this scene, or renders multiple scenes on top of each other.
-   *
-   * To use a custom camera, pass a Drei's camera to `camera` variable, ensure that it has `makeDefault` set to true.
-   *
-   * To use the parent's default camera, pass `null` to `camera` variable.
-   *
-   * Example with a custom `OrthographicCamera`:
-   * ```tsx
-   * const control = useRef<Group>(null);
-   *
-   * return (
-   *   <SceneSync
-   *     hud
-   *     renderPriority={1}
-   *     camera={<OrthographicCamera makeDefault zoom={100} position={[0, 0, 5]} />}
-   *   >
-   *     <Box />
-   *   </SceneSync>
-   * );
-   * ```
-   */
-  hud?: boolean;
-
-  /**
-   * Control the scene's scaling when positioning.
-   */
-  scaleFactor?: number;
-
-  /**
-   * `<SceneSync />` avoid stretching the object by using the smallest dimension of the DOM element.
-   *
-   * This variable will tell `<SceneSync />` to stretch it anyways.
-   */
-  stretch?: boolean;
-
-  /**
-   * Disable automatic scaling on the scene.
-   *
-   * This variable will also disable any scaling settings like `stretch` and `scaleFactor`.
-   */
-  disableScaling?: boolean;
-
-  /**
-   * Disable automatic positioning on the scene.
-   */
-  disablePositioning?: boolean;
 
   /**
    * `<SceneSync />` will depend on this variable to adjust how it should update.
@@ -139,6 +73,53 @@ interface SyncProps {
   trackingMode: 'relaxed' | 'balanced' | 'aggressive';
 
   /**
+   * This variable allows fine-grain control over your scene when passed to `<SceneSync />`.
+   *
+   * `<SceneSync />` will use its own ref and group when creating your scene to control its scale and position.
+   * Setting this variable will disable the internal ref, and you can decide on which object gets controlled.
+   *
+   * This variable is needed for `hud` if you wanted to add a custom camera.
+   *
+   * For listening to change details, use `onLayoutChange` instead.
+   */
+  control?: RefObject<Basic3DTransforms | null>;
+
+  /**
+   * When this variable is set, `<SceneSync />` will send updates when the scene update its positions.
+   *
+   * The function return the calculated DOM rect, with dimension and position in 3D measurements.
+   */
+  onLayoutUpdate?: (
+    rect: DOMRect,
+    dimension: { w: number; h: number },
+    position: { x: number; y: number }
+  ) => void;
+
+  /**
+   * Control the scene's scaling when positioning.
+   */
+  scaleFactor?: number;
+
+  /**
+   * `<SceneSync />` avoid stretching the object by using the smallest dimension of the DOM element.
+   *
+   * This variable will tell `<SceneSync />` to stretch it anyways.
+   */
+  stretch?: boolean;
+
+  /**
+   * Disable automatic scaling on the scene.
+   *
+   * This variable will also disable any scaling settings like `stretch` and `scaleFactor`.
+   */
+  disableScaling?: boolean;
+
+  /**
+   * Disable automatic positioning on the scene.
+   */
+  disablePositioning?: boolean;
+
+  /**
    * Enable this variable to automatically update events for `@react-three/fiber`, allowing precise raycast.
    *
    * Default: `false`
@@ -161,17 +142,34 @@ interface SyncProps {
    */
   tunnelIn?: BasicTunnelIn;
 
-  /**
-   * This key is used for your objects passed into R3F.
-   *
-   * The components will be passed into the same tunnel, so the key here must be unique across pages.
-   */
-  sceneKey: string;
-
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 interface HudProps extends SyncProps {
+  /**
+   * Use `Hud` for this scene or not.
+   *
+   * This is useful when you want to apply custom camera for this scene, or renders multiple scenes on top of each other.
+   *
+   * To use a custom camera, pass a Drei's camera to `camera` variable, ensure that it has `makeDefault` set to true.
+   *
+   * To use the parent's default camera, pass `null` to `camera` variable.
+   *
+   * Example with a custom `OrthographicCamera`:
+   * ```tsx
+   * const control = useRef<Group>(null);
+   *
+   * return (
+   *   <SceneSync
+   *     hud
+   *     renderPriority={1}
+   *     camera={<OrthographicCamera makeDefault zoom={100} position={[0, 0, 5]} />}
+   *   >
+   *     <Box />
+   *   </SceneSync>
+   * );
+   * ```
+   */
   hud: true;
 
   /**
@@ -181,23 +179,42 @@ interface HudProps extends SyncProps {
 
   /**
    * Set the `renderPriority` to render things for `Hud`.
-   *
-   * This variable is ignored when `hud` is not `true`.
    */
   renderPriority: number;
 }
 
 interface NormalProps extends SyncProps {
+  /**
+   * Use `Hud` for this scene or not.
+   *
+   * This is useful when you want to apply custom camera for this scene, or renders multiple scenes on top of each other.
+   *
+   * To use a custom camera, pass a Drei's camera to `camera` variable, ensure that it has `makeDefault` set to true.
+   *
+   * To use the parent's default camera, pass `null` to `camera` variable.
+   *
+   * Example with a custom `OrthographicCamera`:
+   * ```tsx
+   * const control = useRef<Group>(null);
+   *
+   * return (
+   *   <SceneSync
+   *     hud
+   *     renderPriority={1}
+   *     camera={<OrthographicCamera makeDefault zoom={100} position={[0, 0, 5]} />}
+   *   >
+   *     <Box />
+   *   </SceneSync>
+   * );
+   * ```
+   */
   hud?: false;
 }
 
 /**
  * A core part of an in-house tool called `weaver`.
  *
- * A component to allow three objects to track and sync with DOM element.
- *
- * The component uses `<Hud />` under the "hud", so if you want to use more than one `<SceneSync />`,
- * you must set `renderPriority`. If not, the component will render the last scene pushed through React.
+ * A component to allow three.js scene to track and sync with DOM element.
  */
 export default function SceneSync(props: NormalProps | HudProps) {
   if (props.trackingMode === 'relaxed' && !weaverSetup._lenisInstance) {
