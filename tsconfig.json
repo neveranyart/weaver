@@ -1,13 +1,28 @@
 {
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
-    "target": "ES2022",
-    "module": "commonjs",
-    "jsx": "react",
+    "target": "es2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "esnext",
     "outDir": "./dist",
     "declaration": true,
     "strict": true,
     "esModuleInterop": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+
     "paths": {
       "@neveranyart/weaver/helper": ["./src/hooks"],
       "@neveranyart/weaver/routing": ["./src/routing"],
@@ -15,14 +30,6 @@
       "@neveranyart/weaver": ["./src"]
     }
   },
-  "include": [
-    "src/package",
-    "src/hooks",
-    "src/routing",
-    "src/scene",
-    "src/utils",
-    "src/routing/context.ts",
-    "src/setup.ts"
-  ],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

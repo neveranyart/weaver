@@ -1,20 +1,25 @@
 import js from '@eslint/js';
 import reactHooks from 'eslint-plugin-react-hooks';
-import { defineConfig, globalIgnores } from 'eslint/config';
+import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
+import path from 'path';
 import tseslint from 'typescript-eslint';
+import { fileURLToPath } from 'url';
 
-export default defineConfig([
-  globalIgnores(['dist']),
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default tseslint.config(
+  { ignores: ['**/dist', 'eslint.config.js'] },
+
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
+      ...tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
     ],
     languageOptions: {
-      ecmaVersion: 2022,
       globals: globals.browser,
       parserOptions: {
         project: './tsconfig.json',
@@ -22,4 +27,21 @@ export default defineConfig([
       },
     },
   },
-]);
+
+  {
+    files: ['web/**/*.{ts,tsx}'],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: {
+        project: './web/tsconfig.app.json',
+        tsconfigRootDir: __dirname,
+      },
+    },
+  }
+);
