@@ -1,9 +1,9 @@
 <img width="2057" height="1033" alt="weaver" src="https://github.com/user-attachments/assets/bb452bd6-93f3-4848-9f2c-9e0661cd7175" />
 
-An in-house core package with many fun, little tools by neveranyart for making performant React CSR websites.
+An in-house package for making performant React CSR creative websites with ease.
 
 ## Introduction
-This package is a collection of sub-packages for handling many moving part of a creative web with ease.
+This package is a collection of sub-packages for handling many moving part of a creative website.
 
 Most components and tools are built with flexibility in mind, providing a balance between abstraction and verbose.
 
