@@ -4,6 +4,7 @@ import { animate } from 'motion';
 import { motion } from 'motion/react';
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
 import { Mesh, Path, Shape } from 'three';
+import GithubLogo from './Githublogo';
 import NeveranyLogo from './NeveranyLogo';
 
 export default function Hero() {
@@ -21,11 +22,24 @@ function TopIcon() {
 
   return (
     <motion.div
-      className="fixed bottom-1 right-1 h-8"
+      className="fixed bottom-1 right-1 h-7 flex gap-2 items-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: pageRendered ? 1 : 0 }}
     >
-      <NeveranyLogo className="h-7 w-7" fill="black" expand={pageRendered} />
+      <a
+        href="https://github.com/neveranyart/weaver"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <GithubLogo className="h-7 w-7" fill="black" />
+      </a>
+      <a
+        href="https://github.com/neveranyart"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <NeveranyLogo className="h-6 w-6" fill="black" expand={pageRendered} />
+      </a>
     </motion.div>
   );
 }
