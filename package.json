@@ -51,6 +51,7 @@
     "zustand": "^5.0.14"
   },
   "peerDependencies": {
+    "three": ">=0.170.0",
     "@react-three/drei": ">=10.0.0",
     "@react-three/fiber": ">=9.0.0",
     "lenis": ">=1.1.16",
@@ -58,6 +59,9 @@
     "react-router": ">=7.0.0"
   },
   "peerDependenciesMeta": {
+    "three": {
+      "optional": true
+    },
     "@react-three/drei": {
       "optional": true
     },
@@ -78,25 +82,25 @@
     ".": {
       "types": "./dist/index.d.ts",
       "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./hooks": {
       "types": "./dist/hooks.d.ts",
       "require": "./dist/hooks.js",
-      "import": "./dist/hooks.mjs",
+      "import": "./dist/hooks.js",
       "default": "./dist/hooks.js"
     },
     "./routing": {
       "types": "./dist/routing.d.ts",
       "require": "./dist/routing.js",
-      "import": "./dist/routing.mjs",
+      "import": "./dist/routing.js",
       "default": "./dist/routing.js"
     },
     "./scene": {
       "types": "./dist/scene.d.ts",
       "require": "./dist/scene.js",
-      "import": "./dist/scene.mjs",
+      "import": "./dist/scene.js",
       "default": "./dist/scene.js"
     }
   },
