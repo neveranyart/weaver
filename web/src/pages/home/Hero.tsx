@@ -78,7 +78,7 @@ function AnimatedCylinder(props: { index: number }) {
         duration: 0,
       }
     );
-  }, [pageRendered]);
+  }, [pageRendered, props.index]);
 
   const arcShape = useMemo(() => {
     const arcShape = new Shape();
@@ -128,9 +128,9 @@ function Sector(props: { sceneKey: string; children: ReactNode }) {
       animate={{ opacity: pageRendered ? 1 : 0 }}
     >
       <SceneSync
+        sceneKey={props.sceneKey}
         attach={container}
         trackingMode="relaxed"
-        sceneKey={props.sceneKey}
       >
         {props.children}
       </SceneSync>

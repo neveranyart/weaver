@@ -7,7 +7,8 @@ import { OrthographicCamera, PerspectiveCamera } from 'three';
 export function useViewport(
   customCamera?: OrthographicCamera | PerspectiveCamera
 ) {
-  const { viewport, camera } = useThree();
+  const viewport = useThree((state) => state.viewport);
+  const camera = useThree((state) => state.camera);
 
   return {
     width: viewport.getCurrentViewport(customCamera ?? camera).width,

@@ -1,14 +1,8 @@
 import { useProgress } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import React, {
-  Fragment,
-  type ReactNode,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Fragment, type ReactNode, useMemo, useRef, useState } from 'react';
 import { useLayoutEffectOnce } from '../../hooks';
-import { BasicTunnelIn, weaverSetup } from '../../setup';
+import { type BasicTunnelIn, weaverSetup } from '../../setup';
 
 interface BakeSceneProps {
   /**

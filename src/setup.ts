@@ -1,5 +1,5 @@
 import type Lenis from 'lenis';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type BasicTunnelIn = ({ children }: { children: ReactNode }) => null;
 

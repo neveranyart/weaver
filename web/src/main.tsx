@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import { weaverSetup } from '@neveranyart/weaver';
 import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
