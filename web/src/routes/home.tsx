@@ -3,7 +3,7 @@ import { BakeScene } from '@neveranyart/weaver/scene';
 import { OrthographicCamera } from '@react-three/drei';
 import { useState } from 'react';
 import Hero from '../pages/home/Hero';
-import Weave from '../pages/home/Weave';
+import Weave from '../pages/home/components/Weave';
 
 export default function Home() {
   const [sceneReady, setSceneReady] = useState(false);
