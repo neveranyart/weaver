@@ -6,7 +6,7 @@ export default function BoldClaimsXd() {
 
   return (
     <motion.p
-      className="font-semibold text-xl tracking-[0.01rem] ml-1"
+      className="font-semibold text-xl tracking-[0.01rem]"
       initial={{ translateY: '-50%', opacity: 0 }}
       animate={{
         translateY: pageRendered ? '0%' : '-100%',
