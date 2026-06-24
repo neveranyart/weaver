@@ -10,7 +10,8 @@
   "description": "A collection of React CSR components, hooks for handling many moving part of a creative web with ease. ",
   "scripts": {
     "build": "tsup",
-    "prepublishOnly": "tsup"
+    "prepublishOnly": "tsup",
+    "webbuild": "cd web && pnpm build"
   },
   "tsup": {
     "entry": {
