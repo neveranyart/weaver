@@ -181,30 +181,6 @@ interface HudProps extends SyncProps {
 }
 
 interface NormalProps extends SyncProps {
-  /**
-   * Use `Hud` for this scene or not.
-   *
-   * This is useful when you want to apply custom camera for this scene, or renders multiple scenes on top of each other.
-   *
-   * To use a custom camera, pass a Drei's camera to `camera` variable, ensure that it has `makeDefault` set to true.
-   *
-   * To use the parent's default camera, pass `null` to `camera` variable.
-   *
-   * Example with a custom `OrthographicCamera`:
-   * ```tsx
-   * const control = useRef<Group>(null);
-   *
-   * return (
-   *   <SceneSync
-   *     hud
-   *     renderPriority={1}
-   *     camera={<OrthographicCamera makeDefault zoom={100} position={[0, 0, 5]} />}
-   *   >
-   *     <Box />
-   *   </SceneSync>
-   * );
-   * ```
-   */
   hud?: false;
 }
 

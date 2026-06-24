@@ -56,7 +56,7 @@ function Sector(props: { sceneKey: string; children: ReactNode }) {
       <SceneSync
         sceneKey={props.sceneKey}
         attach={container}
-        trackingMode="balanced"
+        trackingMode="relaxed"
         scalingMode="estimate"
       >
         {props.children}

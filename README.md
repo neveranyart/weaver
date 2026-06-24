@@ -2,13 +2,6 @@
 
 An in-house core package with many fun, little tools by neveranyart for making performant React CSR websites.
 
-> [!WARNING]
-> The package is still in active development with many changes between each releases to cover more cases.
-> 
-> So before version 1.0.0 is released, no migration guide will be provided.
-> 
-> Due to conflict with LICENSE commits, we've decided to discard the original history for this repository.
-
 ## Introduction
 This package is a collection of sub-packages for handling many moving part of a creative web with ease.
 

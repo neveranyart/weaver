@@ -47,12 +47,17 @@ createRoot(document.getElementById('root')!).render(
 ## `Pipeline`
 Declares parent for a route, handle route changes and communicates with `DelayedOutlet`.
 
+To make each step in the process of routing atomic, we had to make some trade-offs.
+
+- Each `Pipeline` must have a **static, unique** identifier, so the component can query for it and perform the correct action when navigation happens.
+- Each route must have a handle value with the same value as the identifier to report the `Pipeline` and do things mentioned.
+
+Failing to do 1 or 2 things above will results in unknown behavior.
+
 > [!CAUTION]
 > Only be ONE `Pipeline` per path.
 >
 > It can't nest itself.
-
-Recommended place to put the component is the parent for a route's components
 
 Example usage with 2 endpoints, taken from previous example from `DelayedOutlet`:
 
@@ -73,7 +78,12 @@ function Root() {
 
 function Home() {
   return (
-    <Pipeline title='Home' debugName='Home' parentPath='/'>
+    <Pipeline
+      title="Weaver"
+      debugName="Home"
+      /* IMPORTANT: Setting identifier. */
+      identifier="Home"
+    >
       <p>Home</p>
       <Link to="/projects">Navigate</Link>
     </Pipeline>
@@ -92,17 +102,44 @@ const router = createBrowserRouter([
             <Home />
           </Suspense>
         ),
+        /* IMPORTANT: Setting identifier. */
+        handle: { identifier: 'Home' },
       },
       {
-        path: '/projects/*',
+        path: '/projects',
         element: (
           <Suspense>
-            <Pipeline title='Projects' debugName='Projects' parentPath='/projects/*'>
+            <Pipeline
+              title='Projects'
+              debugName='Projects'
+              /* IMPORTANT: Setting identifier. */
+              identifier="something"
+            >
               <p>Projects</p>
               <Link to="/">Navigate</Link>
             </Pipeline>
           </Suspense>
         ),
+        /* IMPORTANT: Setting identifier. */
+        handle: { identifier: 'something' },
+      },
+      {
+        path: '/projects/*',
+        element: (
+          <Suspense>
+            <Pipeline
+              title='Projects - Wow'
+              debugName='Projects Details'
+              /* IMPORTANT: Setting identifier. */
+              identifier="details"
+            >
+              <p>Hello world!</p>
+              <Link to="/">Navigate</Link>
+            </Pipeline>
+          </Suspense>
+        ),
+        /* IMPORTANT: Setting identifier. */
+        handle: { identifier: 'details' },
       },
     ],
   },
@@ -113,6 +150,45 @@ createRoot(document.getElementById('root')!).render(
     <RouterProvider router={router} />
   </StrictMode>
 );
+```
+
+### Waiting resources
+`Pipline` has a props called `contentReady`, if this is `true`, it will continue doing its job to show the content on screen. If it's `false`, `Pipeline` will wait for it.
+
+For example, waiting for 3D scene to ready before move on to other stages:
+
+```tsx
+<Pipeline
+  title="Weaver"
+  debugName="Home"
+  identifier="Home"
+  contentReady={sceneReady}
+>
+  <BakeScene
+    onSceneReady={() => setSceneReady(true)}
+    sceneKey="homeSceneObjs"
+  >
+    <OrthographicCamera makeDefault position={[0, 0, 5]} zoom={100} />
+  </BakeScene>
+</Pipeline>
+```
+
+### Lenis
+By deafult, `Pipeline` will control lenis if possible, it will automatically stop, start lenis scroll. To disable this behavior, set `lenisUsage` to `false`.
+
+```tsx
+<Pipeline
+  lenisUsage={false}
+/>
+```
+
+### Debugging
+If `debugName` is provided, `Pipeline` will log stage changes to the console, unset the prop to not log anything.
+
+```tsx
+<Pipeline
+  debugName="Home"
+/>
 ```
 
 ## State hooks
