@@ -21,7 +21,7 @@ function TopIcon() {
 
   return (
     <motion.div
-      className="fixed top-2 right-2 h-8"
+      className="fixed bottom-1 right-1 h-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: pageRendered ? 1 : 0 }}
     >
@@ -39,6 +39,29 @@ function Playground() {
         </Sector>
       ))}
     </div>
+  );
+}
+
+function Sector(props: { sceneKey: string; children: ReactNode }) {
+  const pageRendered = useWeaverRouting('pageRendered');
+  const container = useRef<HTMLDivElement>(null);
+
+  return (
+    <motion.div
+      ref={container}
+      className="w-full h-full"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: pageRendered ? 1 : 0 }}
+    >
+      <SceneSync
+        sceneKey={props.sceneKey}
+        attach={container}
+        trackingMode="balanced"
+        scalingMode="estimate"
+      >
+        {props.children}
+      </SceneSync>
+    </motion.div>
   );
 }
 
@@ -62,7 +85,7 @@ function AnimatedCylinder(props: { index: number }) {
 
     animate(
       mesh.current.position,
-      { x: -0.2 },
+      { x: 0 },
       {
         delay: 0.7 + props.index * 0.025,
         duration: 0.5,
@@ -89,6 +112,10 @@ function AnimatedCylinder(props: { index: number }) {
     return arcShape;
   }, []);
 
+  useLayoutEffect(() => {
+    mesh.current?.geometry.center();
+  }, []);
+
   return (
     <mesh
       ref={mesh}
@@ -113,28 +140,6 @@ function AnimatedCylinder(props: { index: number }) {
         opacity={0}
       />
     </mesh>
-  );
-}
-
-function Sector(props: { sceneKey: string; children: ReactNode }) {
-  const pageRendered = useWeaverRouting('pageRendered');
-  const container = useRef<HTMLDivElement>(null);
-
-  return (
-    <motion.div
-      ref={container}
-      className="w-full h-full"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: pageRendered ? 1 : 0 }}
-    >
-      <SceneSync
-        sceneKey={props.sceneKey}
-        attach={container}
-        trackingMode="relaxed"
-      >
-        {props.children}
-      </SceneSync>
-    </motion.div>
   );
 }
 
