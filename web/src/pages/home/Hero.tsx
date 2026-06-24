@@ -162,13 +162,13 @@ function Title() {
 
   return (
     <div className="w-full grid grid-cols-4 gap-4 items-end overflow-clip">
-      <h1 className="text-[7cqi] font-[PlayfairDisplay] font-semibold trim ml-1 mb-1 text-nowrap">
+      <h1 className="text-[7cqi] font-[PlayfairDisplay] font-semibold text-nowrap">
         {'Weaver'.split('').map((value, index) => (
           <motion.span
             key={index}
             className="inline-block"
             initial={{ translateY: '100%' }}
-            animate={{ translateY: pageRendered ? '0%' : '100%' }}
+            animate={{ translateY: pageRendered ? '20%' : '100%' }}
             transition={{
               duration: 0.75,
               delay: 0.025 * index,
