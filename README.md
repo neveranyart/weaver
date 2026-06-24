@@ -1,4 +1,4 @@
-<img width="2132" height="1165" alt="as" src="https://github.com/user-attachments/assets/8c3dc3a4-05c4-4863-838e-19b20d4c4803" />
+<img width="2100" height="1423" alt="weaver" src="https://github.com/user-attachments/assets/c31e67a2-272e-4b3c-9f5e-4d3e1ad2817c" />
 
 An in-house package for making performant React CSR creative websites with ease.
 
