@@ -1,31 +1,22 @@
 import { Hud } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import React, {
-  ReactElement,
+import {
+  type ReactElement,
   type ReactNode,
   type RefObject,
   useCallback,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import { Group } from 'three';
+import { Box3, Group, Mesh, Vector3 } from 'three';
 import { useLayoutEffectOnce } from '../../hooks/effectOnce';
 import { useLenisCallback } from '../../hooks/lenisCallback';
 import { useOrbit } from '../../hooks/orbit';
 import { useScrollCallback } from '../../hooks/scrollCallback';
-import { BasicTunnelIn, weaverSetup } from '../../setup';
+import { type BasicTunnelIn, weaverSetup } from '../../setup';
 import { useViewport } from '../hooks/viewport';
-
-export type Basic3DTransforms = {
-  scale: {
-    set: (x: number, y: number, z: number) => void;
-  };
-  position: {
-    x: number;
-    y: number;
-  };
-};
 
 interface SyncProps {
   /**
@@ -52,7 +43,7 @@ interface SyncProps {
    *
    * There are 3 modes: `relaxed`, `balanced` and `aggressive`.
    *
-   * For each mode, there will be some very distinct trade-offs
+   * For each mode, there will be some very distinct trade-offs:
    *
    * - `relaxed`: Uses IntersectionObserver paired with lenis hook, together with ResizeObserver.
    *    - (+): Minimal update calls, best performance.
@@ -82,7 +73,7 @@ interface SyncProps {
    *
    * For listening to change details, use `onLayoutChange` instead.
    */
-  control?: RefObject<Basic3DTransforms | null>;
+  control?: RefObject<Group | Mesh | null>;
 
   /**
    * When this variable is set, `<SceneSync />` will send updates when the scene update its positions.
@@ -96,35 +87,41 @@ interface SyncProps {
   ) => void;
 
   /**
-   * Control the scene's scaling when positioning.
+   * Enable/disable automatic scaling on the scene.
+   *
+   * Default: `true`
+   *
+   * This variable will also enable/disable: `scalingMode`, `scaleFactor`.
+   */
+  autoScaling?: boolean;
+
+  /**
+   * `<SceneSync />` calculates scaling based on the scene itself, but there are many scenarios that you want to do with your scene.
+   *
+   * So scaling has 4 modes for you to use, all 4 modes allows your objects to bleed out of the DOM element, but it varies from each modes,
+   * but when you intentionally want that, the most stable one is `blind` mode:
+   *
+   * - `estimate`: The default. Adjust the scaling around the on mount measurements of the scene.
+   * - `accurate`: The most demanding one, it will always measure the scene before applying scaling, making sure that the scene
+   * scales correctly according to the DOM element, **DOESN'T WORK WITH `relaxed` TRACKING MODE**.
+   * - `blind`: Assumes your scene is a 1, 1, 1 square, and adjust the scaling around that.
+   * - `stretch`: Do not keep correct scaling, just fill the scene with the DOM element's bounding.
+   */
+  scalingMode?: 'estimate' | 'accurate' | 'blind' | 'stretch';
+
+  /**
+   * Sometimes, the scaling calculated might be larger/smaller than the scene provided.
+   *
+   * Unused when `scalingMode` is set to `accurate`.
    */
   scaleFactor?: number;
 
   /**
-   * `<SceneSync />` avoid stretching the object by using the smallest dimension of the DOM element.
+   * Enable/disable automatic positioning on the scene.
    *
-   * This variable will tell `<SceneSync />` to stretch it anyways.
+   * Default: `true`
    */
-  stretch?: boolean;
-
-  /**
-   * Disable automatic scaling on the scene.
-   *
-   * This variable will also disable any scaling settings like `stretch` and `scaleFactor`.
-   */
-  disableScaling?: boolean;
-
-  /**
-   * Disable automatic positioning on the scene.
-   */
-  disablePositioning?: boolean;
-
-  /**
-   * Enable this variable to automatically update events for `@react-three/fiber`, allowing precise raycast.
-   *
-   * Default: `false`
-   */
-  autoUpdateEvents?: boolean;
+  autoPositioning?: boolean;
 
   /**
    * Set a custom `rootMargin` for `IntersectObserver`.
@@ -256,31 +253,103 @@ function SyncInternal(props: SyncProps) {
   const {
     attach,
     control,
+    autoScaling,
     scaleFactor,
-    stretch,
-    disableScaling,
-    disablePositioning,
-    autoUpdateEvents,
+    scalingMode,
+    autoPositioning,
     onLayoutUpdate,
   } = props;
 
-  const threeEvents = useThree((state) => state.events);
-
   const activeControl = control ?? defaultControl;
 
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const sceneBox = useMemo(() => new Box3(), []);
+  const sceneBounding = useMemo(() => new Vector3(), []);
+
+  const mountBounding = useMemo(() => new Vector3(), []);
+
+  useLayoutEffect(() => {
+    if (!activeControl.current) return;
+    sceneBox.setFromObject(activeControl.current);
+    sceneBox.getSize(sceneBounding);
+
+    if (mountBounding.equals({ x: 0, y: 0, z: 0 })) {
+      mountBounding.copy(sceneBounding);
+    }
+  }, [activeControl, mountBounding, scalingMode, sceneBounding, sceneBox]);
+
+  const scalingMethods = useMemo(
+    () => ({
+      estimate(
+        scene: RefObject<Group | Mesh | null>,
+        w: number,
+        h: number,
+        scaleFactor: number
+      ) {
+        if (!scene.current) return;
+
+        const scale =
+          Math.min(w / mountBounding.x, h / mountBounding.y) * scaleFactor;
+
+        scene.current.scale.set(scale, scale, scale);
+      },
+      accurate(
+        scene: RefObject<Group | Mesh | null>,
+        w: number,
+        h: number,
+        scaleFactor: number
+      ) {
+        if (!scene.current) return;
+
+        sceneBox.setFromObject(scene.current);
+        sceneBox.getSize(sceneBounding);
+
+        const scale =
+          Math.min(
+            w / (sceneBounding.x / scene.current.scale.x),
+            h / (sceneBounding.y / scene.current.scale.y)
+          ) * scaleFactor;
+
+        scene.current.scale.set(scale, scale, scale);
+      },
+      blind(
+        scene: RefObject<Group | Mesh | null>,
+        w: number,
+        h: number,
+        scaleFactor: number
+      ) {
+        if (!scene.current) return;
+
+        const scale = Math.min(w, h) * scaleFactor;
+        scene.current.scale.set(scale, scale, scale);
+      },
+      stretch(
+        scene: RefObject<Group | Mesh | null>,
+        w: number,
+        h: number,
+        scaleFactor: number
+      ) {
+        if (!scene.current) return;
+
+        scene.current.scale.set(
+          w * scaleFactor,
+          h * scaleFactor,
+          Math.min(w, h) * scaleFactor
+        );
+      },
+    }),
+    [mountBounding.x, mountBounding.y, sceneBounding, sceneBox]
+  );
+
   const updatePosition = useCallback(() => {
     if (!activeControl.current || !attach.current) return;
 
     const domRect = attach.current.getBoundingClientRect();
-    const screenH = window.innerHeight;
-    const screenW = window.innerWidth;
     const scroll = weaverSetup._lenisInstance?.actualScroll ?? window.scrollY;
 
-    const vpWidthRatio = viewport.width / screenW;
-    const vpHeightRatio = viewport.height / screenH;
+    const vpWidthRatio = viewport.width / window.innerWidth;
+    const vpHeightRatio = viewport.height / window.innerHeight;
 
-    const scrollOffset = (scroll / screenH) * viewport.height;
+    const scrollOffset = (scroll / window.innerHeight) * viewport.height;
 
     const w = domRect.width * vpWidthRatio;
     const h = domRect.height * vpHeightRatio;
@@ -298,38 +367,29 @@ function SyncInternal(props: SyncProps) {
 
     const unwrapedScaleFactor = scaleFactor ?? 1;
 
-    if (!disableScaling) {
-      if (!stretch) {
-        const minScale = Math.min(w, h) * unwrapedScaleFactor;
-        activeControl.current.scale.set(minScale, minScale, minScale);
-      } else {
-        activeControl.current.scale.set(
-          w * unwrapedScaleFactor,
-          h * unwrapedScaleFactor,
-          Math.min(w, h) * unwrapedScaleFactor
-        );
-      }
-    }
-
-    if (!disablePositioning) {
+    if (autoPositioning === undefined || autoPositioning) {
       // eslint-disable-next-line react-hooks/immutability
       activeControl.current.position.x = x;
       activeControl.current.position.y = y;
     }
 
-    if (autoUpdateEvents && threeEvents.update) {
-      threeEvents.update();
+    if (autoScaling === undefined || autoScaling) {
+      scalingMethods[scalingMode ?? 'estimate'](
+        activeControl,
+        w,
+        h,
+        unwrapedScaleFactor
+      );
     }
   }, [
     activeControl,
     attach,
-    autoUpdateEvents,
-    disablePositioning,
-    disableScaling,
+    autoPositioning,
+    autoScaling,
     onLayoutUpdate,
     scaleFactor,
-    stretch,
-    threeEvents,
+    scalingMethods,
+    scalingMode,
     viewport.height,
     viewport.width,
   ]);
