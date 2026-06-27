@@ -4,7 +4,7 @@ import {
   useContext,
   useLayoutEffect,
 } from 'react';
-import { WeaverContext } from '..';
+import { WeaverContext } from '../context';
 import { useOrbit } from './orbit';
 
 interface HookOptions {

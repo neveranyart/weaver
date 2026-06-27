@@ -12,7 +12,8 @@ import {
   type RefObject,
 } from 'react';
 import { Box3, Group, Mesh, Vector3 } from 'three';
-import { WeaverContext, type BasicTunnelIn } from '../../';
+import { type BasicTunnelIn } from '../../';
+import { WeaverContext } from '../../context';
 import { useLayoutEffectOnce } from '../../hooks/effectOnce';
 import { useLenisCallback } from '../../hooks/lenisCallback';
 import { useOrbit } from '../../hooks/orbit';

@@ -8,7 +8,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { WeaverContext, type BasicTunnelIn } from '../../';
+import { type BasicTunnelIn } from '../../';
+import { WeaverContext } from '../../context';
 import { useLayoutEffectOnce } from '../../hooks';
 
 interface BakeSceneProps {
@@ -91,6 +92,8 @@ interface BakeSceneProps {
 export default function BakeScene(props: BakeSceneProps) {
   const { children, tunnelIn, ...passProps } = props;
   const weaverContext = useContext(WeaverContext);
+
+  console.log(weaverContext);
 
   const TunnelIn = tunnelIn ?? weaverContext.canvasTunnel;
 

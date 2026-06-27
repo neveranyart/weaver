@@ -14,17 +14,16 @@
   },
   "tsup": {
     "entry": {
-      "index": "src/index.tsx",
+      "index": "src/index.ts",
       "routing": "src/routing/index.ts",
       "scene": "src/scene/index.ts",
       "hooks": "src/hooks/index.ts"
     },
     "format": [
-      "cjs",
       "esm"
     ],
     "dts": true,
-    "splitting": false,
+    "splitting": true,
     "sourcemap": true,
     "clean": true
   },

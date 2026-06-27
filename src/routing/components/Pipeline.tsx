@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useMatches } from 'react-router';
-import { WeaverContext } from '../../';
+import { WeaverContext } from '../../context';
 import { useWeaverRoutingContext } from '../context';
 
 interface PipelineProps {
