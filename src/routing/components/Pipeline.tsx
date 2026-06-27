@@ -1,4 +1,3 @@
-import { WeaverContext } from '@neveranyart/weaver';
 import {
   useCallback,
   useContext,
@@ -8,6 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useMatches } from 'react-router';
+import { WeaverContext } from '../../';
 import { useWeaverRoutingContext } from '../context';
 
 interface PipelineProps {
