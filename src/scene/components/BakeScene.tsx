@@ -1,8 +1,15 @@
 import { useProgress } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Fragment, type ReactNode, useMemo, useRef, useState } from 'react';
+import {
+  Fragment,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import { WeaverContext, type BasicTunnelIn } from '../../';
 import { useLayoutEffectOnce } from '../../hooks';
-import { type BasicTunnelIn, weaverSetup } from '../../setup';
 
 interface BakeSceneProps {
   /**
@@ -83,8 +90,9 @@ interface BakeSceneProps {
  */
 export default function BakeScene(props: BakeSceneProps) {
   const { children, tunnelIn, ...passProps } = props;
+  const weaverContext = useContext(WeaverContext);
 
-  const TunnelIn = tunnelIn ?? weaverSetup._Default3DTunnelIn;
+  const TunnelIn = tunnelIn ?? weaverContext.canvasTunnel;
 
   if (!TunnelIn) {
     throw Error(

@@ -1,5 +1,10 @@
-import { type RefObject, useCallback, useLayoutEffect } from 'react';
-import { weaverSetup } from '../setup';
+import {
+  type RefObject,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+} from 'react';
+import { WeaverContext } from '..';
 import { useOrbit } from './orbit';
 
 interface HookOptions {
@@ -24,19 +29,21 @@ export function useLenisCallback(
   callback: (latest: number, reason: ScrollCallbackReason) => void,
   options?: HookOptions
 ) {
-  if (!weaverSetup._lenisInstance) {
+  const weaverContext = useContext(WeaverContext);
+
+  if (!weaverContext.lenis) {
     throw Error(
       "`useLenisCallback` won't work without a lenis instance. Provide one via weaverSetup.setLenisInstance or `useCrollCallback` instead."
     );
   }
 
   const callbackWrapScroll = useCallback(
-    () => callback(weaverSetup._lenisInstance!.actualScroll, 'scroll'),
-    [callback]
+    () => callback(weaverContext.lenis!.actualScroll, 'scroll'),
+    [callback, weaverContext.lenis]
   );
   const callbackWrapResize = useCallback(
-    () => callback(weaverSetup._lenisInstance!.actualScroll, 'resize'),
-    [callback]
+    () => callback(weaverContext.lenis!.actualScroll, 'resize'),
+    [callback, weaverContext.lenis]
   );
 
   useOrbit({
@@ -45,12 +52,12 @@ export function useLenisCallback(
       onIntersect(entry) {
         callbackWrapScroll();
         if (entry.isIntersecting) {
-          weaverSetup._lenisInstance!.on('scroll', callbackWrapScroll);
+          weaverContext.lenis!.on('scroll', callbackWrapScroll);
           window.addEventListener('resize', callbackWrapResize, {
             passive: true,
           });
         } else {
-          weaverSetup._lenisInstance!.off('scroll', callbackWrapScroll);
+          weaverContext.lenis!.off('scroll', callbackWrapScroll);
           window.removeEventListener('resize', callbackWrapResize);
         }
       },
@@ -60,16 +67,16 @@ export function useLenisCallback(
 
   useLayoutEffect(() => {
     if (!options?.intersectOn) {
-      weaverSetup._lenisInstance!.on('scroll', callbackWrapScroll);
+      weaverContext.lenis!.on('scroll', callbackWrapScroll);
       window.addEventListener('resize', callbackWrapResize, { passive: true });
     }
 
     if (options?.initialCall) {
-      callback(weaverSetup._lenisInstance!.actualScroll, 'initialize');
+      callback(weaverContext.lenis!.actualScroll, 'initialize');
     }
 
     return () => {
-      weaverSetup._lenisInstance!.off('scroll', callbackWrapScroll);
+      weaverContext.lenis!.off('scroll', callbackWrapScroll);
       window.removeEventListener('resize', callbackWrapResize);
     };
   }, [
@@ -78,5 +85,6 @@ export function useLenisCallback(
     callbackWrapScroll,
     options?.initialCall,
     options?.intersectOn,
+    weaverContext.lenis,
   ]);
 }

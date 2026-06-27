@@ -1,21 +1,22 @@
 import { Hud } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import {
-  type ReactElement,
-  type ReactNode,
-  type RefObject,
   useCallback,
+  useContext,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  type ReactElement,
+  type ReactNode,
+  type RefObject,
 } from 'react';
 import { Box3, Group, Mesh, Vector3 } from 'three';
+import { WeaverContext, type BasicTunnelIn } from '../../';
 import { useLayoutEffectOnce } from '../../hooks/effectOnce';
 import { useLenisCallback } from '../../hooks/lenisCallback';
 import { useOrbit } from '../../hooks/orbit';
 import { useScrollCallback } from '../../hooks/scrollCallback';
-import { type BasicTunnelIn, weaverSetup } from '../../setup';
 import { useViewport } from '../hooks/viewport';
 
 interface SyncProps {
@@ -190,13 +191,15 @@ interface NormalProps extends SyncProps {
  * A component to allow three.js scene to track and sync with DOM element.
  */
 export default function SceneSync(props: NormalProps | HudProps) {
-  if (props.trackingMode === 'relaxed' && !weaverSetup._lenisInstance) {
+  const weaverContext = useContext(WeaverContext);
+
+  if (props.trackingMode === 'relaxed' && !weaverContext.lenis) {
     console.warn(
       'Due to how DOM event listener works for scrolling. The scene might fall behind with the actual current scroll progress. For the best user experience, use lenis and provide the instance using weaverSetup.setLenisInstance() before mounting any `SceneSync`.'
     );
   }
 
-  const TunnelIn = props.tunnelIn ?? weaverSetup._Default3DTunnelIn;
+  const TunnelIn = props.tunnelIn ?? weaverContext.canvasTunnel;
 
   if (!TunnelIn) {
     throw Error(
@@ -223,6 +226,7 @@ export default function SceneSync(props: NormalProps | HudProps) {
 }
 
 function SyncInternal(props: SyncProps) {
+  const weaverContext = useContext(WeaverContext);
   const viewport = useViewport();
 
   const defaultControl = useRef<Group>(null);
@@ -320,7 +324,7 @@ function SyncInternal(props: SyncProps) {
     if (!activeControl.current || !attach.current) return;
 
     const domRect = attach.current.getBoundingClientRect();
-    const scroll = weaverSetup._lenisInstance?.actualScroll ?? window.scrollY;
+    const scroll = weaverContext.lenis?.actualScroll ?? window.scrollY;
 
     const vpWidthRatio = viewport.width / window.innerWidth;
     const vpHeightRatio = viewport.height / window.innerHeight;
@@ -368,6 +372,7 @@ function SyncInternal(props: SyncProps) {
     scalingMode,
     viewport.height,
     viewport.width,
+    weaverContext.lenis?.actualScroll,
   ]);
 
   /**
@@ -378,7 +383,7 @@ function SyncInternal(props: SyncProps) {
   }, [updatePosition]);
 
   const mode = {
-    relaxed: weaverSetup._lenisInstance ? (
+    relaxed: weaverContext.lenis ? (
       <RelaxedUpdateLenis
         attach={props.attach}
         updatePosition={updatePosition}
