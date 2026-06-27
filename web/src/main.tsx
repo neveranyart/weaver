@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import { weaverSetup } from '@neveranyart/weaver';
+import { WeaverProvider } from '@neveranyart/weaver';
 import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
@@ -8,18 +8,6 @@ import { GlobalTunnel } from './context';
 import './index.css';
 import { activateLenis, lenisInstance } from './lenisInstance';
 import Root from './routes/__root';
-
-/**
- * Set a default tunnel for `<SceneSync />`
- */
-weaverSetup.set3DTunnel(GlobalTunnel.Canvas.In);
-
-/**
- * Activate the normal Lenis implementation to control the underlying instance
- * for ease of access.
- */
-activateLenis();
-weaverSetup.setLenisInstance(lenisInstance);
 
 const NotFound = lazy(() => import('./routes/404'));
 const Home = lazy(() => import('./routes/home'));
@@ -53,8 +41,16 @@ const router = createBrowserRouter([
   },
 ]);
 
+/**
+ * Activate the normal Lenis implementation to control the underlying instance
+ * for ease of access.
+ */
+activateLenis();
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <WeaverProvider lenis={lenisInstance} canvasTunnel={GlobalTunnel.Canvas.In}>
+      <RouterProvider router={router} />
+    </WeaverProvider>
   </StrictMode>
 );
