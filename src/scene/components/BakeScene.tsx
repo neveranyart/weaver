@@ -93,8 +93,6 @@ export default function BakeScene(props: BakeSceneProps) {
   const { children, tunnelIn, ...passProps } = props;
   const weaverContext = useContext(WeaverContext);
 
-  console.log(weaverContext);
-
   const TunnelIn = tunnelIn ?? weaverContext.canvasTunnel;
 
   if (!TunnelIn) {
