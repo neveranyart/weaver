@@ -96,8 +96,12 @@ It has been tested extensively, so you don't have to suffer like we did developi
 
 There are 2 components that plays with each other in order to pull this off, introducing `DelayedOutlet` and `Pipeline`.
 
-> [!CAUTION]
-> The only officially supported router is `BrowserRouter` data mode, we didn't test with other methods.
+> [!NOTE]
+> The officially supported router setup is `BrowserRouter`/`createBrowserRouter`.
+> 
+> But in theory, these components does work with any type of routing provided by `react-router`.
+>
+> `wouter` support is also on the way!
 
 ## `DelayedOutlet`
 
