@@ -1,13 +1,13 @@
 import {
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
   type ReactNode,
 } from 'react';
 import { useMatches } from 'react-router';
-import { useEffectOnce } from '../../hooks/effectOnce';
-import { weaverSetup } from '../../setup';
+import { WeaverContext } from '../../context';
 import { useWeaverRoutingContext } from '../context';
 
 interface PipelineProps {
@@ -73,6 +73,8 @@ export default function Pipeline(props: PipelineProps) {
 }
 
 function RouteHandler(props: Omit<PipelineProps, 'children'>) {
+  const weaverContext = useContext(WeaverContext);
+
   const matches = useMatches();
   const routeIdentifier = useMemo(() => {
     const handle = matches[matches.length - 1].handle as {
@@ -113,7 +115,7 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
 
     if (!navigating && !pageRendered) {
       if (props.lenisUsage === undefined || props.lenisUsage) {
-        weaverSetup._lenisInstance?.start();
+        weaverContext.lenis?.start();
       }
 
       setPageRendered(true);
@@ -132,6 +134,7 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
     routeIdentifier,
     setActiveIdentifier,
     setPageRendered,
+    weaverContext.lenis,
   ]);
 
   useLayoutEffect(() => {
@@ -149,17 +152,25 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
     setActivePipeline(props.identifier);
   }, [props.identifier, props.title, setActivePipeline]);
 
-  useEffectOnce(() => {
-    return () => {
+  useEffect(
+    () => () => {
+      /**
+       * Is the clean up event about navigation.
+       *
+       *
+       * If `routeIdentifier` !== our identifier, it's probably a good idea to clean things up.
+       */
+      if (routeIdentifier === props.identifier) return;
+
       /**
        * When unmounted, stop lenis to pass control to another Pipline instance.
-       *
-       * The unmount process only happens when the `<LoadingFallback />` kicks in,
-       * so any visual glitches can happen in here, we can now set the scroll position to 0.
        */
-      if (props.lenisUsage === undefined || props.lenisUsage) {
-        weaverSetup._lenisInstance?.stop();
-        weaverSetup._lenisInstance?.scrollTo(0, {
+      if (
+        routeIdentifier !== props.identifier &&
+        (props.lenisUsage === undefined || props.lenisUsage)
+      ) {
+        weaverContext.lenis?.stop();
+        weaverContext.lenis?.scrollTo(0, {
           immediate: true,
           force: true,
         });
@@ -167,8 +178,15 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
 
       if (props.debugName)
         console.log(`[${props.debugName}] Renderer status: Unmounted`);
-    };
-  });
+    },
+    [
+      props.debugName,
+      props.identifier,
+      props.lenisUsage,
+      routeIdentifier,
+      weaverContext.lenis,
+    ]
+  );
 
   return null;
 }
