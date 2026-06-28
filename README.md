@@ -100,8 +100,6 @@ There are 2 components that plays with each other in order to pull this off, int
 > The officially supported router setup is `BrowserRouter`/`createBrowserRouter`.
 > 
 > But in theory, these components does work with any type of routing provided by `react-router`.
->
-> `wouter` support is also on the way!
 
 ## `DelayedOutlet`
 
