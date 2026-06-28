@@ -167,10 +167,9 @@ Each `Pipeline` requires two things that must match:
 1. A **static, unique** `identifier` prop on the component.
 2. A `handle` value on the route definition with the same identifier.
 
-`DelayedOutlet` checks for `handle.identifier` of each match and throws error when isn't found.
-
 > [!WARNING]
-> **Mismatching the identifier will cause `Pipeline` to not own the route, staying in limbo.**
+> - `DelayedOutlet` checks for `handle.identifier` of each match and throws error when isn't found.
+> - **Mismatching the identifier will cause `Pipeline` to not own the route, staying in limbo.**
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
