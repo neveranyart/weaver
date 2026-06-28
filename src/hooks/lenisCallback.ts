@@ -33,7 +33,7 @@ export function useLenisCallback(
 
   if (!weaverContext.lenis) {
     throw Error(
-      "`useLenisCallback` won't work without a lenis instance. Provide one via weaverSetup.setLenisInstance or `useCrollCallback` instead."
+      "`useLenisCallback` won't work without a lenis instance. Provide one via `<WeaverProvider />` or `useCrollCallback` instead."
     );
   }
 

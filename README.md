@@ -1,6 +1,6 @@
 <img width="2100" height="1423" alt="weaver" src="https://github.com/user-attachments/assets/c31e67a2-272e-4b3c-9f5e-4d3e1ad2817c" />
 
-An in-house package for making performant React CSR creative websites with ease.
+An in-house package for making performant React 19 CSR creative websites with ease.
 
 # Introduction
 
@@ -10,7 +10,7 @@ Most components and tools are built with flexibility in mind, providing a balanc
 
 But some will have its constrains, planting itself deep into how your project structures.
 
-This is not required, but to fully utilize this package, your project should already using `react-router`, `lenis` and `@react-three/*`.
+To fully utilize this package, your project should already using `react-router`, `lenis` and `@react-three/*`.
 
 > [!NOTE]
 > `React v19+` is required.
@@ -24,7 +24,19 @@ npm i @neveranyart/weaver
 
 # Documentations
 
-## 0. `WeaverProvider`
+- [`WeaverProvider`](#weaverprovider)
+-  [Routing](#routing)
+    - [`DelayedOutlet`](#delayeduutlet)
+    - [`Pipeline`](#pipeline)
+    - [`useWeaverState`](#useweaverstate)
+- [Scene](#scene)
+    - [`BakeScene`](#bakescene)
+    - [`SceneSync`](#scenesync)
+- [Hooks](#hooks)
+
+---
+
+## `WeaverProvider`
 
 `WeaverProvider` is an optional context provider, but it's crucial if you're planning to use the package for 3D scenes and routing.
 
@@ -76,7 +88,7 @@ export default function ThreeCanvas() {
 ---
 
 
-## 1. Routing
+## Routing
 
 The routing sub-package wraps around `react-router` to support delayed route transitions, while a route is pending, the previous route stays visible, giving you full control over animations and transitions.
 
@@ -294,7 +306,7 @@ Pipeline actively checks for mismatch so step 4 applies even when user cancels b
 
 ---
 
-## 2. Scene
+## Scene
 
 A `@react-three/*` sub-package for syncing 3D scenes with DOM elements.
 
@@ -452,7 +464,7 @@ All modes allow objects to bleed outside the DOM element, they just differ in ho
 |------|-----------|
 | `estimate` | Default. Scales based on the scene's on-mount measurements. |
 | `accurate` | Re-measures before every scale update, most precise, but incompatible with `relaxed` tracking. |
-| `blind` | Treats the scene as a `1×1×1` cube and scales from there. Most stable when you're intentionally let the scene bleeds out. |
+| `blind` | Treats the scene as a `1×1×1` cube and scales from there. Most stable when you're intentionally let the scene bleeds out, like a big array of pictures. |
 | `stretch` | Ignores aspect ratio and just fills the DOM element's bounding box. |
 
 #### `scaleFactor`
@@ -505,7 +517,36 @@ Pass `null` to `camera` to inherit the parent scene's camera instead.
 | `camera` | `ReactElement \| null` | Camera for this layer. Must have `makeDefault`. Pass `null` to use the parent's camera. |
 | `renderPriority` | `number` | R3F render priority for this HUD layer. |
 
-3. [Hooks](https://github.com/neveranyart/weaver/blob/main/docs/HOOKS.md)
+---
+
+## Hooks
+
+A collection of React hooks ranging from DOM to 3D to lenis scrolling.
+
+### Universial hooks
+
+Any hooks that doesn't require external packages imported will lives in `/hooks`.
+
+- [`useBreakpoints`](https://github.com/neveranyart/weaver/blob/main/src/hooks/breakpoints.ts) ⚹ Screen breakpoints just like TailwindCSS in react.
+- [`useDeviceMotion`](https://github.com/neveranyart/weaver/blob/main/src/hooks/deviceMotion.ts) ⚹ Device motion's API.
+- [`useEffectOnce`, `useLayoutEffectOnce`](https://github.com/neveranyart/weaver/blob/main/src/hooks/effectOnce.ts) ⚹ Mount/unmount effect, ignore all states.
+- [`useLenisCallback`](https://github.com/neveranyart/weaver/blob/main/src/hooks/lenisCallback.ts) ⚹ Lenis scroll callback with react to screen changes and the option to only call on element intersect.
+- [`useScrollCallback`](https://github.com/neveranyart/weaver/blob/main/src/hooks/scrollCallback.ts) ⚹ DOM scroll callback with react to screen changes and the option to only call on element intersect.
+- [`useMouseCallback`](https://github.com/neveranyart/weaver/blob/main/src/hooks/mouseCallback.ts) ⚹ DOM scroll callback with react to screen changes and the option to only call on element intersect.
+- [`useOrbit`](https://github.com/neveranyart/weaver/blob/main/src/hooks/orbit.ts) ⚹ Quick `ResizeObserver` and `IntersectionObserver`.
+- [`useReflect`](https://github.com/neveranyart/weaver/blob/main/src/hooks/reflect.ts) ⚹ Keeps a version of a state that has data, if the value is undefined or null, the hook doesn't change.
+- [`useScreen`](https://github.com/neveranyart/weaver/blob/main/src/hooks/screen.ts) ⚹ State update when screen size changes.
+- [`useScreenCallback`](https://github.com/neveranyart/weaver/blob/main/src/hooks/screenCallback.ts) ⚹ Callback when screen size changes.
+
+### External packages hooks
+
+Hooks that require a, or many external packages to be installed.
+
+- [`useWeaverRouting`](https://github.com/neveranyart/weaver/blob/main/src/routing/hooks/weaverRouting.ts) ⚹ `react-router` specific. A hook to know what stage of the navigation transition when using weaver's routing, crucial for your page transition.
+- [`useViewport`](https://github.com/neveranyart/weaver/blob/main/src/scene/hooks/viewport.ts) ⚹ `@react-three/fiber` specific. State change when camera or screen size changes with the actual measurements.
+- [`useNavigateAnchor`](https://github.com/neveranyart/weaver/blob/main/src/routing/hooks/navigateAnchor.ts) ⚹ `react-router` specific. A hook to allow custom `<Link />` replacement with navigation event support.
+- [`useRawParams`](https://github.com/neveranyart/weaver/blob/main/src/routing/hooks/rawParams.ts) ⚹ `react-router` specific. Updates and splits pathname on location change.
 
 # License
+
 LGPL-2.1-or-later

@@ -41,6 +41,16 @@ interface SyncProps {
   attach: RefObject<HTMLElement | null>;
 
   /**
+   * This variable allows fine-grain control over your scene when passed to `<SceneSync />`.
+   *
+   * `<SceneSync />` will use its own ref and group when creating your scene to control its scale and position.
+   * Setting this variable will disable the internal ref, and you can decide on which object gets controlled.
+   *
+   * For listening to change details, use `onLayoutChange` instead.
+   */
+  control?: RefObject<Group | Mesh | null>;
+
+  /**
    * `<SceneSync />` will depend on this variable to adjust how it should update.
    *
    * There are 3 modes: `relaxed`, `balanced` and `aggressive`.
@@ -64,18 +74,6 @@ interface SyncProps {
    * Best of both worlds is `balanced` mode, for simpler scenes that doesn't change its position, `relaxed` should be used.
    */
   trackingMode: 'relaxed' | 'balanced' | 'aggressive';
-
-  /**
-   * This variable allows fine-grain control over your scene when passed to `<SceneSync />`.
-   *
-   * `<SceneSync />` will use its own ref and group when creating your scene to control its scale and position.
-   * Setting this variable will disable the internal ref, and you can decide on which object gets controlled.
-   *
-   * This variable is needed for `hud` if you wanted to add a custom camera.
-   *
-   * For listening to change details, use `onLayoutChange` instead.
-   */
-  control?: RefObject<Group | Mesh | null>;
 
   /**
    * When this variable is set, `<SceneSync />` will send updates when the scene update its positions.
@@ -133,11 +131,9 @@ interface SyncProps {
   rootMargin?: string;
 
   /**
+   * `<SceneSync />` will look for a provided tunnel if the variable is not set.
+   * 
    * Set a custom tunnel for `<SceneSync />` send the components to for this scene only.
-   *
-   * Which is useful for example, put the objects inside a container in the scene.
-   *
-   * To set a default tunnel, pass it to `setDefaulTunnel` before use.
    */
   tunnelIn?: BasicTunnelIn;
 
@@ -196,7 +192,7 @@ export default function SceneSync(props: NormalProps | HudProps) {
 
   if (props.trackingMode === 'relaxed' && !weaverContext.lenis) {
     console.warn(
-      'Due to how DOM event listener works for scrolling. The scene might fall behind with the actual current scroll progress. For the best user experience, use lenis and provide the instance using weaverSetup.setLenisInstance() before mounting any `SceneSync`.'
+      'Due to how DOM event listener works for scrolling. The scene might lags behind with the actual current scroll progress. For the best user experience, use Lenis and provide an instance via `<WeaverProvider />` before mounting any `<SceneSync />`.'
     );
   }
 
