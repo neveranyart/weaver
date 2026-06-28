@@ -296,8 +296,8 @@ const navigating = useWeaverState('navigating');
 1. User navigates from `"/"` to `"/projects"` /// `pageRendered → false`, `navigating → true`.
 2. `DelayedOutlet` receives the new parent and holds the parent.
 4. Delay elapses /// `navigating → false`, the outgoing Pipeline at `"/"` unmounting.
-5. The incoming `Pipeline` is set /// `activePipeline → "/projects"`.
-6. New Pipeline mounts /// `activeParent → "/projects"`, `pageRendered → true`.
+5. The incoming `Pipeline` is set /// `activePipeline → "Projects"`.
+6. New Pipeline mounts /// `activeParent → "Projects"`, `pageRendered → true`.
 
 ### Cancelled navigation
 
