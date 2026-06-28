@@ -14,7 +14,7 @@ export default function ModeChooser(props: {
       initial={{ opacity: 0 }}
       animate={{ opacity: pageRendered ? 1 : 0 }}
     >
-      <motion.span
+      <motion.button
         className="select-none cursor-pointer"
         onClick={() => props.setScalingMode('estimate')}
         initial={{ opacity: 1 }}
@@ -22,9 +22,9 @@ export default function ModeChooser(props: {
         transition={{ duration: 0.1 }}
       >
         estimate
-      </motion.span>
+      </motion.button>
       {' / '}
-      <motion.span
+      <motion.button
         className="select-none cursor-pointer"
         onClick={() => props.setScalingMode('accurate')}
         initial={{ opacity: 0.5 }}
@@ -32,7 +32,7 @@ export default function ModeChooser(props: {
         transition={{ duration: 0.1 }}
       >
         accurate
-      </motion.span>
+      </motion.button>
     </motion.p>
   );
 }
