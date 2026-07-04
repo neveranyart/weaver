@@ -1,6 +1,15 @@
 {
   "author": "neveranyart",
   "name": "@neveranyart/weaver",
+  "keywords": [
+    "csr",
+    "react",
+    "react-router",
+    "lenis",
+    "three",
+    "threejs",
+    "react-three-fiber"
+  ],
   "repository": {
     "url": "git+https://github.com/neveranyart/weaver.git"
   },
