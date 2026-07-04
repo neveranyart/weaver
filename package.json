@@ -4,9 +4,13 @@
   "repository": {
     "url": "git+https://github.com/neveranyart/weaver.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "private": false,
   "type": "module",
   "license": "LGPL-2.1-or-later",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "A collection of React CSR components, hooks for handling many moving part of a creative web with ease. ",
   "scripts": {
     "build": "tsup",
