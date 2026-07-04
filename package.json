@@ -10,7 +10,7 @@
   "private": false,
   "type": "module",
   "license": "LGPL-2.1-or-later",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A collection of React CSR components, hooks for handling many moving part of a creative web with ease. ",
   "scripts": {
     "build": "tsup",
