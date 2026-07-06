@@ -335,8 +335,7 @@ function SyncInternal({
 
     const vpWidthRatio = viewport.width / window.innerWidth;
     const vpHeightRatio = viewport.height / window.innerHeight;
-
-    const scrollOffset = (scroll / window.innerHeight) * viewport.height;
+    const vpScroll = scroll * vpHeightRatio;
 
     const w = domRect.width * vpWidthRatio;
     const h = domRect.height * vpHeightRatio;
@@ -346,18 +345,16 @@ function SyncInternal({
       viewport.height * 0.5 -
       (domRect.y + scroll) * vpHeightRatio -
       h * 0.5 +
-      scrollOffset;
+      vpScroll;
 
-    if (onLayoutUpdate) {
-      onLayoutUpdate(domRect, { w, h }, { x, y });
-    }
+    onLayoutUpdate?.(domRect, { w, h }, { x, y });
 
-    if (autoPositioning === undefined || autoPositioning) {
+    if (autoPositioning !== false) {
       activeControl.current.position.x = x;
       activeControl.current.position.y = y;
     }
 
-    if (autoScaling === undefined || autoScaling) {
+    if (autoScaling !== false) {
       scalingMethods[scalingMode](activeControl, w, h, scaleFactor);
     }
   }, [
