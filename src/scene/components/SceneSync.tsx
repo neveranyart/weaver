@@ -352,15 +352,13 @@ function SyncInternal({
       onLayoutUpdate(domRect, { w, h }, { x, y });
     }
 
-    const unwrapedScaleFactor = scaleFactor;
-
     if (autoPositioning === undefined || autoPositioning) {
       activeControl.current.position.x = x;
       activeControl.current.position.y = y;
     }
 
     if (autoScaling === undefined || autoScaling) {
-      scalingMethods[scalingMode](activeControl, w, h, unwrapedScaleFactor);
+      scalingMethods[scalingMode](activeControl, w, h, scaleFactor);
     }
   }, [
     activeControl,
