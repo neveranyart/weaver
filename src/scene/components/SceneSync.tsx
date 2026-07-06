@@ -331,21 +331,15 @@ function SyncInternal({
     if (!activeControl.current || !attach.current) return;
 
     const domRect = attach.current.getBoundingClientRect();
-    const scroll = weaverContext.lenis?.actualScroll ?? window.scrollY;
 
     const vpWidthRatio = viewport.width / window.innerWidth;
     const vpHeightRatio = viewport.height / window.innerHeight;
-    const vpScroll = scroll * vpHeightRatio;
 
     const w = domRect.width * vpWidthRatio;
     const h = domRect.height * vpHeightRatio;
 
     const x = domRect.x * vpWidthRatio + w * 0.5 - viewport.width * 0.5;
-    const y =
-      viewport.height * 0.5 -
-      (domRect.y + scroll) * vpHeightRatio -
-      h * 0.5 +
-      vpScroll;
+    const y = viewport.height * 0.5 - domRect.y * vpHeightRatio - h * 0.5;
 
     onLayoutUpdate?.(domRect, { w, h }, { x, y });
 
@@ -368,7 +362,6 @@ function SyncInternal({
     scalingMode,
     viewport.height,
     viewport.width,
-    weaverContext.lenis?.actualScroll,
   ]);
 
   /**
