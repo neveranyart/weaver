@@ -1,12 +1,25 @@
 {
   "author": "neveranyart",
   "name": "@neveranyart/weaver",
+  "keywords": [
+    "csr",
+    "react",
+    "react-router",
+    "lenis",
+    "three",
+    "threejs",
+    "react-three-fiber"
+  ],
   "repository": {
     "url": "git+https://github.com/neveranyart/weaver.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "private": false,
   "type": "module",
   "license": "LGPL-2.1-or-later",
-  "version": "1.0.0",
+  "version": "1.2.4",
   "description": "A collection of React CSR components, hooks for handling many moving part of a creative web with ease. ",
   "scripts": {
     "build": "tsup",
@@ -41,10 +54,10 @@
     "jiti": "^2.7.0",
     "lenis": "^1.3.25",
     "react": "^19.2.7",
-    "react-router": "^8.0.1",
+    "react-router": "^8.1.0",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.0"
+    "typescript-eslint": "^8.62.1"
   },
   "dependencies": {
     "zustand": "^5.0.14"
@@ -103,5 +116,5 @@
       "default": "./dist/scene.js"
     }
   },
-  "packageManager": "pnpm@11.9.0"
+  "packageManager": "pnpm@11.10.0"
 }

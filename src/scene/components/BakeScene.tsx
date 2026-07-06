@@ -130,19 +130,21 @@ function NotificationHandler(
   );
 }
 
-function RenderNotifier(
-  props: Omit<BakeSceneProps, 'children' | 'tunnelIn'> & {
-    onCallbackScheduled: () => void;
-  }
-) {
+function RenderNotifier({
+  stableFramesTarget = 30,
+  callbackTimeout = 1000,
+  waitIdleInterrupt = 5000,
+  onCallbackScheduled,
+  onSceneReady,
+}: Omit<BakeSceneProps, 'children' | 'tunnelIn'> & {
+  onCallbackScheduled: () => void;
+}) {
   const { progress, active } = useProgress();
   const scheduledForCallback = useRef(false);
 
   const shuttle = useRef(0);
   const frameTime = useRef(0);
   const stableFrame = useRef(0);
-
-  const framesTarget = props.stableFramesTarget ?? 30;
 
   const requestIdleCallbackPolyfill = useMemo(() => {
     return (
@@ -156,15 +158,13 @@ function RenderNotifier(
               return Math.max(0, 50 - (Date.now() - start));
             },
           });
-        }, props.callbackTimeout ?? 1000);
+        }, callbackTimeout);
       }
     );
-  }, [props.callbackTimeout]);
+  }, [callbackTimeout]);
 
   useFrame((_, delta) => {
-    // Extra safety net before React unmount this component.
     if (scheduledForCallback.current) return;
-
     if (progress < 100 && active) return;
 
     shuttle.current += 1;
@@ -174,13 +174,13 @@ function RenderNotifier(
     if (delta > average) return;
     stableFrame.current += 1;
 
-    if (stableFrame.current < framesTarget) return;
+    if (stableFrame.current < stableFramesTarget) return;
 
     scheduledForCallback.current = true;
-    props.onCallbackScheduled();
+    onCallbackScheduled();
 
-    requestIdleCallbackPolyfill(props.onSceneReady, {
-      timeout: props.waitIdleInterrupt ?? 5000,
+    requestIdleCallbackPolyfill(onSceneReady, {
+      timeout: waitIdleInterrupt,
     });
   });
 

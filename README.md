@@ -167,7 +167,9 @@ Each `Pipeline` requires two things that must match:
 1. A **static, unique** `identifier` prop on the component.
 2. A `handle` value on the route definition with the same identifier.
 
-**Mismatching or omitting either will result in undefined behavior.**
+> [!WARNING]
+> - `DelayedOutlet` checks for `handle.identifier` of last route match and throws error when isn't found.
+> - **Mismatching the identifier will cause `Pipeline` to not own the route, staying in limbo.**
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
@@ -294,15 +296,15 @@ const navigating = useWeaverState('navigating');
 1. User navigates from `"/"` to `"/projects"` /// `pageRendered → false`, `navigating → true`.
 2. `DelayedOutlet` receives the new parent and holds the parent.
 4. Delay elapses /// `navigating → false`, the outgoing Pipeline at `"/"` unmounting.
-5. The incoming `Pipeline` is set /// `activePipeline → "/projects"`.
-6. New Pipeline mounts /// `activeParent → "/projects"`, `pageRendered → true`.
+5. The incoming `Pipeline` is set /// `activePipeline → "Projects"`.
+6. New Pipeline mounts /// `activeParent → "Projects"`, `pageRendered → true`.
 
 ### Cancelled navigation
 
 1. User navigates from `"/"` to `"/projects"` /// `pageRendered → false`, `navigating → true`.
 2. `DelayedOutlet` receives the new parent and holds the parent.
 3. User cancels before the delay elapses.
-4. The current Pipeline at `"/"` detects mismatch, reverting /// `navigating → false`, `pageRendered → true`.
+4. Detects mismatch, reverting /// `navigating → false`, `pageRendered → true`.
 
 Pipeline actively checks for mismatch so step 4 applies even when user cancels before `DelayedOutlet` can hold parent and wait.
 

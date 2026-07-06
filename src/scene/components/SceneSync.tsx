@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { Hud } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import {
@@ -99,15 +100,17 @@ interface SyncProps {
    * `<SceneSync />` calculates scaling based on the scene itself, but there are many scenarios that you want to do with your scene.
    *
    * So scaling has 4 modes for you to use, all 4 modes allows your objects to bleed out of the DOM element, but it varies from each modes,
-   * but when you intentionally want that, the most stable one is `blind` mode:
+   * but when you intentionally want that, the most stable one is `box` mode:
    *
-   * - `estimate`: The default. Adjust the scaling around the on mount measurements of the scene.
-   * - `accurate`: The most demanding one, it will always measure the scene before applying scaling, making sure that the scene
-   * scales correctly according to the DOM element, **DOESN'T WORK WITH `relaxed` TRACKING MODE**.
-   * - `blind`: Assumes your scene is a 1, 1, 1 square, and adjust the scaling around that.
-   * - `stretch`: Do not keep correct scaling, just fill the scene with the DOM element's bounding.
+   * - `box`: Assumes your scene is a square, and adjust the scaling around that, it allows 3D scene to massively overflow the element.
+   * - `stretch`: Do not keep correct scaling, just fill the scene with the DOM element's bounding, great fit for drei's `<Image />`.
+   * - `estimate`: Adjust the scaling around the on mount measurements of the scene. Compatible with all 3 tracking modes.
+   * - `accurate`: Not compatible with `relaxed` tracking mode. It will always remeasure the scene before applying scaling,
+   * making sure that the scene scales correctly according to the DOM element, **DOESN'T WORK WITH `relaxed` TRACKING MODE**.
+   *
+   * The default scaling mode is `box`, .
    */
-  scalingMode?: 'estimate' | 'accurate' | 'blind' | 'stretch';
+  scalingMode?: 'box' | 'stretch' | 'estimate' | 'accurate';
 
   /**
    * Sometimes, the scaling calculated might be larger/smaller than the scene provided.
@@ -132,7 +135,7 @@ interface SyncProps {
 
   /**
    * `<SceneSync />` will look for a provided tunnel if the variable is not set.
-   * 
+   *
    * Set a custom tunnel for `<SceneSync />` send the components to for this scene only.
    */
   tunnelIn?: BasicTunnelIn;
@@ -222,20 +225,22 @@ export default function SceneSync(props: NormalProps | HudProps) {
   );
 }
 
-function SyncInternal(props: SyncProps) {
+function SyncInternal({
+  attach,
+  control,
+  trackingMode = 'relaxed',
+  autoScaling = true,
+  scalingMode = 'box',
+  scaleFactor = 1,
+  autoPositioning = true,
+  rootMargin,
+  children,
+  onLayoutUpdate,
+}: SyncProps) {
   const weaverContext = useContext(WeaverContext);
   const viewport = useViewport();
 
   const defaultControl = useRef<Group>(null);
-  const {
-    attach,
-    control,
-    autoScaling,
-    scaleFactor,
-    scalingMode,
-    autoPositioning,
-    onLayoutUpdate,
-  } = props;
 
   const activeControl = control ?? defaultControl;
 
@@ -245,7 +250,12 @@ function SyncInternal(props: SyncProps) {
   const mountBounding = useMemo(() => new Vector3(), []);
 
   useLayoutEffect(() => {
-    if (!activeControl.current) return;
+    if (
+      !activeControl.current ||
+      scalingMode === 'box' ||
+      scalingMode === 'stretch'
+    )
+      return;
     sceneBox.setFromObject(activeControl.current);
     sceneBox.getSize(sceneBounding);
 
@@ -256,6 +266,31 @@ function SyncInternal(props: SyncProps) {
 
   const scalingMethods = useMemo(
     () => ({
+      box(
+        scene: RefObject<Group | Mesh | null>,
+        w: number,
+        h: number,
+        scaleFactor: number
+      ) {
+        if (!scene.current) return;
+
+        const scale = Math.min(w, h) * scaleFactor;
+        scene.current.scale.set(scale, scale, scale);
+      },
+      stretch(
+        scene: RefObject<Group | Mesh | null>,
+        w: number,
+        h: number,
+        scaleFactor: number
+      ) {
+        if (!scene.current) return;
+
+        scene.current.scale.set(
+          w * scaleFactor,
+          h * scaleFactor,
+          Math.min(w, h) * scaleFactor
+        );
+      },
       estimate(
         scene: RefObject<Group | Mesh | null>,
         w: number,
@@ -288,31 +323,6 @@ function SyncInternal(props: SyncProps) {
 
         scene.current.scale.set(scale, scale, scale);
       },
-      blind(
-        scene: RefObject<Group | Mesh | null>,
-        w: number,
-        h: number,
-        scaleFactor: number
-      ) {
-        if (!scene.current) return;
-
-        const scale = Math.min(w, h) * scaleFactor;
-        scene.current.scale.set(scale, scale, scale);
-      },
-      stretch(
-        scene: RefObject<Group | Mesh | null>,
-        w: number,
-        h: number,
-        scaleFactor: number
-      ) {
-        if (!scene.current) return;
-
-        scene.current.scale.set(
-          w * scaleFactor,
-          h * scaleFactor,
-          Math.min(w, h) * scaleFactor
-        );
-      },
     }),
     [mountBounding.x, mountBounding.y, sceneBounding, sceneBox]
   );
@@ -321,42 +331,25 @@ function SyncInternal(props: SyncProps) {
     if (!activeControl.current || !attach.current) return;
 
     const domRect = attach.current.getBoundingClientRect();
-    const scroll = weaverContext.lenis?.actualScroll ?? window.scrollY;
 
     const vpWidthRatio = viewport.width / window.innerWidth;
     const vpHeightRatio = viewport.height / window.innerHeight;
-
-    const scrollOffset = (scroll / window.innerHeight) * viewport.height;
 
     const w = domRect.width * vpWidthRatio;
     const h = domRect.height * vpHeightRatio;
 
     const x = domRect.x * vpWidthRatio + w * 0.5 - viewport.width * 0.5;
-    const y =
-      viewport.height * 0.5 -
-      (domRect.y + scroll) * vpHeightRatio -
-      h * 0.5 +
-      scrollOffset;
+    const y = viewport.height * 0.5 - domRect.y * vpHeightRatio - h * 0.5;
 
-    if (onLayoutUpdate) {
-      onLayoutUpdate(domRect, { w, h }, { x, y });
-    }
+    onLayoutUpdate?.(domRect, { w, h }, { x, y });
 
-    const unwrapedScaleFactor = scaleFactor ?? 1;
-
-    if (autoPositioning === undefined || autoPositioning) {
-      // eslint-disable-next-line react-hooks/immutability
+    if (autoPositioning !== false) {
       activeControl.current.position.x = x;
       activeControl.current.position.y = y;
     }
 
-    if (autoScaling === undefined || autoScaling) {
-      scalingMethods[scalingMode ?? 'estimate'](
-        activeControl,
-        w,
-        h,
-        unwrapedScaleFactor
-      );
+    if (autoScaling !== false) {
+      scalingMethods[scalingMode](activeControl, w, h, scaleFactor);
     }
   }, [
     activeControl,
@@ -369,7 +362,6 @@ function SyncInternal(props: SyncProps) {
     scalingMode,
     viewport.height,
     viewport.width,
-    weaverContext.lenis?.actualScroll,
   ]);
 
   /**
@@ -382,40 +374,40 @@ function SyncInternal(props: SyncProps) {
   const mode = {
     relaxed: weaverContext.lenis ? (
       <RelaxedUpdateLenis
-        attach={props.attach}
+        attach={attach}
         updatePosition={updatePosition}
-        rootMargin={props.rootMargin}
+        rootMargin={rootMargin}
       />
     ) : (
       <RelaxedUpdateDom
-        attach={props.attach}
+        attach={attach}
         updatePosition={updatePosition}
-        rootMargin={props.rootMargin}
+        rootMargin={rootMargin}
       />
     ),
     balanced: (
       <BalancedUpdate
-        attach={props.attach}
+        attach={attach}
         updatePosition={updatePosition}
-        rootMargin={props.rootMargin}
+        rootMargin={rootMargin}
       />
     ),
     aggressive: <AggressiveUpdate updatePosition={updatePosition} />,
   };
 
-  if (props.control) {
+  if (control) {
     return (
       <>
-        {props.children}
-        {mode[props.trackingMode]}
+        {children}
+        {mode[trackingMode]}
       </>
     );
   }
 
   return (
     <group ref={defaultControl}>
-      {props.children}
-      {mode[props.trackingMode]}
+      {children}
+      {mode[trackingMode]}
     </group>
   );
 }
