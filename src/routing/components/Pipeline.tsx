@@ -114,7 +114,7 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
     }
 
     if (!navigating && !pageRendered) {
-      if (props.lenisUsage === undefined || props.lenisUsage) {
+      if (props.lenisUsage !== false) {
         weaverContext.lenis?.start();
       }
 
@@ -165,10 +165,7 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
       /**
        * When unmounted, stop lenis to pass control to another Pipline instance.
        */
-      if (
-        routeIdentifier !== props.identifier &&
-        (props.lenisUsage === undefined || props.lenisUsage)
-      ) {
+      if (routeIdentifier !== props.identifier && props.lenisUsage !== false) {
         weaverContext.lenis?.stop();
         weaverContext.lenis?.scrollTo(0, {
           immediate: true,

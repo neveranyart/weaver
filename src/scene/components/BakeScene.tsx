@@ -106,7 +106,7 @@ export default function BakeScene(props: BakeSceneProps) {
       <Fragment key={props.sceneKey}>
         {children}
         <NotificationHandler {...passProps} />
-        {(props.autoClear === undefined || props.autoClear) && <AutoClearGl />}
+        {props.autoClear !== false && <AutoClearGl />}
       </Fragment>
     </TunnelIn>
   );
