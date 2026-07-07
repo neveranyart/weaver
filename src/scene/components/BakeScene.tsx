@@ -1,5 +1,5 @@
 import { useProgress } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import {
   Fragment,
   useContext,
@@ -10,7 +10,6 @@ import {
 } from 'react';
 import { type BasicTunnelIn } from '../../';
 import { WeaverContext } from '../../context';
-import { useLayoutEffectOnce } from '../../hooks';
 
 interface BakeSceneProps {
   /**
@@ -22,13 +21,6 @@ interface BakeSceneProps {
    * Provide a custom tunnel, ignoring the default tunnel.
    */
   tunnelIn?: BasicTunnelIn;
-
-  /**
-   * Clear leftovers dead scene when unmounting `BakeScene`.
-   *
-   * Default to `true`.
-   */
-  autoClear?: boolean;
 
   /**
    * Set a custom stable frame count target that the component deems as "stable".
@@ -106,7 +98,6 @@ export default function BakeScene(props: BakeSceneProps) {
       <Fragment key={props.sceneKey}>
         {children}
         <NotificationHandler {...passProps} />
-        {props.autoClear !== false && <AutoClearGl />}
       </Fragment>
     </TunnelIn>
   );
@@ -167,12 +158,12 @@ function RenderNotifier({
     if (scheduledForCallback.current) return;
     if (progress < 100 && active) return;
 
-    shuttle.current += 1;
+    shuttle.current++;
     frameTime.current += delta;
     const average = frameTime.current / shuttle.current;
 
     if (delta > average) return;
-    stableFrame.current += 1;
+    stableFrame.current++;
 
     if (stableFrame.current < stableFramesTarget) return;
 
@@ -182,15 +173,6 @@ function RenderNotifier({
     requestIdleCallbackPolyfill(onSceneReady, {
       timeout: waitIdleInterrupt,
     });
-  });
-
-  return null;
-}
-
-function AutoClearGl() {
-  const { gl } = useThree();
-  useLayoutEffectOnce(() => () => {
-    gl.clear();
   });
 
   return null;
