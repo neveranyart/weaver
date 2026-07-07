@@ -56,6 +56,8 @@ interface SyncProps {
    *
    * There are 3 modes: `relaxed`, `balanced` and `aggressive`.
    *
+   * The default is `relaxed`.
+   *
    * For each mode, there will be some very distinct trade-offs:
    *
    * - `relaxed`: Uses IntersectionObserver paired with lenis hook, together with ResizeObserver.
@@ -74,7 +76,7 @@ interface SyncProps {
    *
    * Best of both worlds is `balanced` mode, for simpler scenes that doesn't change its position, `relaxed` should be used.
    */
-  trackingMode: 'relaxed' | 'balanced' | 'aggressive';
+  trackingMode?: 'relaxed' | 'balanced' | 'aggressive';
 
   /**
    * When this variable is set, `<SceneSync />` will send updates when the scene update its positions.
@@ -193,7 +195,10 @@ interface NormalProps extends SyncProps {
 export default function SceneSync(props: NormalProps | HudProps) {
   const weaverContext = useContext(WeaverContext);
 
-  if (props.trackingMode === 'relaxed' && !weaverContext.lenis) {
+  if (
+    !props.trackingMode ||
+    (props.trackingMode === 'relaxed' && !weaverContext.lenis)
+  ) {
     console.warn(
       'Due to how DOM event listener works for scrolling. The scene might lags behind with the actual current scroll progress. For the best user experience, use Lenis and provide an instance via `<WeaverProvider />` before mounting any `<SceneSync />`.'
     );
