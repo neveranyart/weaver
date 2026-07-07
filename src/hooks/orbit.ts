@@ -19,10 +19,7 @@ export function useOrbit(options: {
   const { rootMargin = '25% 0px 25% 0px' } = options;
 
   useEffect(() => {
-    if (!options.target || !options.target.current) {
-      console.warn('Given DOM ref is empty', options.target);
-      return;
-    }
+    if (!options.target || !options.target.current) return;
 
     let orbitResize = undefined;
     if (onResize) {
