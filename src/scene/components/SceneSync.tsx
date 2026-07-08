@@ -196,8 +196,8 @@ export default function SceneSync(props: NormalProps | HudProps) {
   const weaverContext = useContext(WeaverContext);
 
   if (
-    !props.trackingMode ||
-    (props.trackingMode === 'relaxed' && !weaverContext.lenis)
+    (!props.trackingMode || props.trackingMode === 'relaxed') &&
+    !weaverContext.lenis
   ) {
     console.warn(
       'Due to how DOM event listener works for scrolling. The scene might lags behind with the actual current scroll progress. For the best user experience, use Lenis and provide an instance via `<WeaverProvider />` before mounting any `<SceneSync />`.'
