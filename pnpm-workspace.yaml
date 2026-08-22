@@ -1,7 +1,7 @@
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
-  - eslint@10.6.0
+  - eslint@10.6.0 || 10.9.0
   - '@typescript-eslint/eslint-plugin@8.63.0'
   - '@typescript-eslint/parser@8.63.0'
   - '@typescript-eslint/project-service@8.63.0'
@@ -13,6 +13,7 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/utils@8.63.0'
   - '@typescript-eslint/visitor-keys@8.63.0'
   - typescript-eslint@8.63.0
+  - react-router@8.3.0
 packages:
   - '.'
   - './web'
