@@ -105,12 +105,12 @@ interface SyncProps {
    * but when you intentionally want that, the most stable one is `box` mode:
    *
    * - `box`: Assumes your scene is a square, and adjust the scaling around that, it allows 3D scene to massively overflow the element.
-   * - `stretch`: Do not keep correct scaling, just fill the scene with the DOM element's bounding, great fit for drei's `<Image />`.
    * - `estimate`: Adjust the scaling around the on mount measurements of the scene. Compatible with all 3 tracking modes.
-   * - `accurate`: Not compatible with `relaxed` tracking mode. It will always remeasure the scene before applying scaling,
-   * making sure that the scene scales correctly according to the DOM element, **DOESN'T WORK WITH `relaxed` TRACKING MODE**.
+   * - `accurate`: Remeasures the scene before applying scaling, making sure that the scene scales correctly according to
+   * the DOM element, **DOESN'T WORK WITH `relaxed` TRACKING MODE**.
+   * - `stretch`: Do not keep correct scaling, just fill the scene with the DOM element's bounding, great fit for drei's `<Image />`.
    *
-   * The default scaling mode is `box`, .
+   * The default scaling mode is `box`.
    */
   scalingMode?: 'box' | 'stretch' | 'estimate' | 'accurate';
 

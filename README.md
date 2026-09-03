@@ -36,6 +36,81 @@ npm i @neveranyart/weaver
 
 ---
 
+## Recommended Setup
+
+### Lenis & Fiber syncing
+
+To ensure that the 3D elements get the latest Lenis value, it's recommended to rAF it before Fiber on the same rAF.
+
+Setting `<Canvas />` to `frameloop="never"` and Lenis `autoraf: false` to disable their rAFs.
+
+For `motion` setup:
+
+```tsx
+import { advance } from '@react-three/fiber';
+import { frame } from 'motion/react';
+
+frame.update(({ timestamp }) => {
+  lenisInstance.raf(timestamp);
+}, true);
+
+frame.render(({ timestamp }) => {
+  advance(timestamp);
+}, true);
+```
+
+Without `motion`:
+
+```tsx
+import { advance } from '@react-three/fiber';
+
+function syncer(timestamp: DOMHighResTimeStamp) {
+  lenisInstance.raf(timestamp);
+  advance(timestamp);
+  requestAnimationFrame(syncer);
+}
+
+requestAnimationFrame(syncer);
+```
+
+### <Canvas />
+
+For this package to work properly, `<Canvas />` must be a fullscreen, fixed element, and any event is handled through `document.body`, this will allows 3D objects to be in front or behind of the DOM element while keeping its events.
+
+This raises an issue, because `<Canvas />` is fixed, but `document.body` can be scrolled, any pointer event passed to `<Canvas />` will have a scroll offset value added to it.
+
+To fix, simply reimplement the pointer position to remove the offset:
+
+```tsx
+import { Preload } from '@react-three/drei';
+import { Canvas, events } from '@react-three/fiber';
+import { lenisInstance } from '../../lenisInstance';
+
+export default function ThreeCanvas() {
+  return (
+    <Canvas
+      frameloop="never"
+      eventSource={document.body}
+      events={(state) => ({
+        ...events(state),
+        compute: (event, state) => {
+          const adjustedY = event.offsetY - lenisInstance.actualScroll;
+          state.pointer.set(
+            (event.offsetX / state.size.width) * 2 - 1,
+            -(adjustedY / state.size.height) * 2 + 1
+          );
+          state.raycaster.setFromCamera(state.pointer, state.camera);
+        },
+      })}
+    >
+      <Preload all />
+    </Canvas>
+  );
+}
+```
+
+---
+
 ## `WeaverProvider`
 
 `WeaverProvider` is an optional context provider, but it's crucial if you're planning to use the package for 3D scenes and routing.
@@ -390,7 +465,7 @@ function DOMBox() {
         sceneKey="hello-box"
         attach={container}
         trackingMode="relaxed"
-        scalingMode="blind"
+        scalingMode="box"
       >
         <Box />
       </SceneSync>
@@ -459,17 +534,17 @@ Toggles automatic scaling. Disabling this also disables `scalingMode` and `scale
 
 #### `scalingMode`
 ```ts
-scalingMode?: 'estimate' | 'accurate' | 'blind' | 'stretch'
+scalingMode?: 'estimate' | 'accurate' | 'box' | 'stretch'
 ```
 
 All modes allow objects to bleed outside the DOM element, they just differ in how scaling gets calculated:
 
 | Mode | Behaviour |
 |------|-----------|
-| `estimate` | Default. Scales based on the scene's on-mount measurements. |
-| `accurate` | Re-measures before every scale update, most precise, but incompatible with `relaxed` tracking. |
-| `blind` | Treats the scene as a `1×1×1` cube and scales from there. Most stable when you're intentionally let the scene bleeds out, like a big array of pictures. |
-| `stretch` | Ignores aspect ratio and just fills the DOM element's bounding box. |
+| `box` | Default. Treats the scene as a `1×1×1` cube and scales from there. Most stable when you're intentionally let the scene bleeds out, like a big array of pictures. |
+| `estimate` | Adjust the scaling around the on mount measurements of the scene. Compatible with all 3 tracking modes. |
+| `accurate` | Remeasures the scene before applying scaling, making sure that the scene scales correctly according to the DOM element, **DOESN'T WORK WITH `relaxed` TRACKING MODE**. |
+| `stretch` | Do not keep correct scaling, just fill the scene with the DOM element's bounding, great fit for drei's `<Image />`. |
 
 #### `scaleFactor`
 ```ts

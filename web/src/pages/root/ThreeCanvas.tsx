@@ -12,7 +12,7 @@ export default function ThreeCanvas() {
 
         /**
          * The `eventSource` is set to `document.body`, but `<Canvas />` only fills the viewport,
-         * when body is scrollable, the mouse input got offsetted, the compute function here is to
+         * when body is scrollable, the pointer input got offsetted, the compute function here is to
          * adjust for scroll height.
          */
         compute: (event, state) => {
