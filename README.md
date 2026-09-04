@@ -55,7 +55,7 @@ frame.update(({ timestamp }) => {
 }, true);
 
 frame.render(({ timestamp }) => {
-  advance(timestamp);
+  advance(timestamp * 0.001);
 }, true);
 ```
 
@@ -66,7 +66,7 @@ import { advance } from '@react-three/fiber';
 
 function syncer(timestamp: DOMHighResTimeStamp) {
   lenisInstance.raf(timestamp);
-  advance(timestamp);
+  advance(timestamp * 0.001);
   requestAnimationFrame(syncer);
 }
 
