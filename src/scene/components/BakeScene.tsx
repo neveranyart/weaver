@@ -1,4 +1,3 @@
-import { useProgress } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import {
   Fragment,
@@ -130,7 +129,6 @@ function RenderNotifier({
 }: Omit<BakeSceneProps, 'children' | 'tunnelIn'> & {
   onCallbackScheduled: () => void;
 }) {
-  const { progress, active } = useProgress();
   const scheduledForCallback = useRef(false);
 
   const shuttle = useRef(0);
@@ -156,7 +154,6 @@ function RenderNotifier({
 
   useFrame((_, delta) => {
     if (scheduledForCallback.current) return;
-    if (progress < 100 && active) return;
 
     shuttle.current++;
     frameTime.current += delta;
