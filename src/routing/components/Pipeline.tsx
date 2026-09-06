@@ -122,7 +122,7 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
       setActiveIdentifier(props.identifier);
 
       if (props.debugName)
-        console.log(`[${props.debugName}] Renderer status: Mounted`);
+        console.info(`[${props.debugName}] Renderer status: Mounted`);
     }
   }, [
     navigating,
@@ -174,7 +174,7 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
       }
 
       if (props.debugName)
-        console.log(`[${props.debugName}] Renderer status: Unmounted`);
+        console.info(`[${props.debugName}] Renderer status: Unmounted`);
     },
     [
       props.debugName,

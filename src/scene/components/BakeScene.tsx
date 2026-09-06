@@ -1,3 +1,4 @@
+import { useProgress } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import {
   Fragment,
@@ -49,6 +50,13 @@ interface BakeSceneProps {
    * Default: 5000 (ms).
    */
   waitIdleInterrupt?: number;
+
+  /**
+   * Whether to wait for network resource loading or not.
+   *
+   * Default: true.
+   */
+  waitForProgress?: boolean;
 
   /**
    * Reports back when the objects are ready to be displayed.
@@ -124,11 +132,13 @@ function RenderNotifier({
   stableFramesTarget = 30,
   callbackTimeout = 1000,
   waitIdleInterrupt = 5000,
+  waitForProgress = true,
   onCallbackScheduled,
   onSceneReady,
 }: Omit<BakeSceneProps, 'children' | 'tunnelIn'> & {
   onCallbackScheduled: () => void;
 }) {
+  const { progress, active } = useProgress();
   const scheduledForCallback = useRef(false);
 
   const shuttle = useRef(0);
@@ -154,6 +164,7 @@ function RenderNotifier({
 
   useFrame((_, delta) => {
     if (scheduledForCallback.current) return;
+    if (waitForProgress && progress < 100 && active) return;
 
     shuttle.current++;
     frameTime.current += delta;
