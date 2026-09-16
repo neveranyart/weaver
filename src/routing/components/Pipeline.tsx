@@ -37,6 +37,17 @@ interface PipelineProps {
   identifier: string;
 
   /**
+   * Callback to know when the `<Pipeline />` is mounted.
+   *
+   * "Mounted" here means the `<Pipeline />` finished taking over.
+   *
+   * So it can be triggered multiple times even though your component is still in its lifecycle.
+   *
+   * One example of that happening is when the user rapidly switching routes.
+   */
+  onMounted?: () => void;
+
+  /**
    * If provided, `Pipeline` will log the current phase to console.
    */
   debugName?: string;
@@ -61,18 +72,23 @@ interface PipelineProps {
  *
  * All parent routes must have `Pipeline` in order to work and sync with `DelayedOutlet`.
  */
-export default function Pipeline(props: PipelineProps) {
-  const { children, ...restOfProps } = props;
-
+export default function Pipeline({ children, ...props }: PipelineProps) {
   return (
     <>
-      <RouteHandler {...restOfProps} />
+      <RouteHandler {...props} />
       {children}
     </>
   );
 }
 
-function RouteHandler(props: Omit<PipelineProps, 'children'>) {
+function RouteHandler({
+  contentReady,
+  debugName,
+  identifier,
+  onMounted,
+  lenisUsage,
+  title,
+}: Omit<PipelineProps, 'children'>) {
   const weaverContext = useContext(WeaverContext);
 
   const matches = useMatches();
@@ -105,32 +121,34 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
 
   const updater = useCallback(() => {
     // Don't touch anything if it's not even yours.
-    if (routeIdentifier !== props.identifier) {
+    if (routeIdentifier !== identifier) {
       return;
     }
 
-    if (props.contentReady !== undefined && !props.contentReady) {
+    if (contentReady !== undefined && !contentReady) {
       return;
     }
 
     if (!navigating && !pageRendered) {
-      if (props.lenisUsage !== false) {
+      if (lenisUsage !== false) {
         weaverContext.lenis?.start();
       }
 
       setPageRendered(true);
-      setActiveIdentifier(props.identifier);
+      setActiveIdentifier(identifier);
 
-      if (props.debugName)
-        console.info(`[${props.debugName}] Renderer status: Mounted`);
+      onMounted?.();
+
+      if (debugName) console.info(`[${debugName}] Renderer status: Mounted`);
     }
   }, [
     navigating,
     pageRendered,
-    props.contentReady,
-    props.debugName,
-    props.identifier,
-    props.lenisUsage,
+    contentReady,
+    debugName,
+    identifier,
+    lenisUsage,
+    onMounted,
     routeIdentifier,
     setActiveIdentifier,
     setPageRendered,
@@ -148,9 +166,9 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
   }, [updater]);
 
   useEffect(() => {
-    document.title = props.title;
-    setActivePipeline(props.identifier);
-  }, [props.identifier, props.title, setActivePipeline]);
+    document.title = title;
+    setActivePipeline(identifier);
+  }, [identifier, title, setActivePipeline]);
 
   useEffect(
     () => () => {
@@ -160,12 +178,12 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
        *
        * If `routeIdentifier` !== our identifier, it's probably a good idea to clean things up.
        */
-      if (routeIdentifier === props.identifier) return;
+      if (routeIdentifier === identifier) return;
 
       /**
        * When unmounted, stop lenis to pass control to another Pipline instance.
        */
-      if (routeIdentifier !== props.identifier && props.lenisUsage !== false) {
+      if (routeIdentifier !== identifier && lenisUsage !== false) {
         weaverContext.lenis?.stop();
         weaverContext.lenis?.scrollTo(0, {
           immediate: true,
@@ -173,16 +191,9 @@ function RouteHandler(props: Omit<PipelineProps, 'children'>) {
         });
       }
 
-      if (props.debugName)
-        console.info(`[${props.debugName}] Renderer status: Unmounted`);
+      if (debugName) console.info(`[${debugName}] Renderer status: Unmounted`);
     },
-    [
-      props.debugName,
-      props.identifier,
-      props.lenisUsage,
-      routeIdentifier,
-      weaverContext.lenis,
-    ]
+    [debugName, identifier, lenisUsage, routeIdentifier, weaverContext.lenis]
   );
 
   return null;
