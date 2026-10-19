@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/immutability */
 import { Hud } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import {
@@ -60,6 +59,7 @@ interface SyncProps {
    *
    * For each mode, there will be some very distinct trade-offs:
    *
+   * - `never`: Do not run the update automatically, for this mode, you can supply a ref into `manualUpdate` to update it yourself.
    * - `relaxed`: Uses IntersectionObserver paired with lenis hook, together with ResizeObserver.
    *    - (+): Minimal update calls, best performance.
    *    - (-): The scene get desynced the moment DOM element moves without changing its sizes.
@@ -76,7 +76,7 @@ interface SyncProps {
    *
    * Best of both worlds is `balanced` mode, for simpler scenes that doesn't change its position, `relaxed` should be used.
    */
-  trackingMode?: 'relaxed' | 'balanced' | 'aggressive';
+  trackingMode?: 'never' | 'relaxed' | 'balanced' | 'aggressive';
 
   /**
    * When this variable is set, `<SceneSync />` will send updates when the scene update its positions.
@@ -88,6 +88,18 @@ interface SyncProps {
     dimension: { w: number; h: number },
     position: { x: number; y: number }
   ) => void;
+
+  /**
+   * Allows manually updating `<SceneSync />` internals.
+   *
+   * This is helpful for granular control over when a scene should update.
+   *
+   * It is recommended to use it along-side `relaxed` tracking mode and write your own logic
+   * to handle when the DOM element moves.
+   *
+   * The update function reads `getBoundingClientRect`, beware for forced reflow.
+   */
+  manualUpdate?: RefObject<() => void>;
 
   /**
    * Enable/disable automatic scaling on the scene.
@@ -241,6 +253,7 @@ function SyncInternal({
   rootMargin,
   children,
   onLayoutUpdate,
+  manualUpdate,
 }: SyncProps) {
   const weaverContext = useContext(WeaverContext);
   const viewport = useViewport();
@@ -332,7 +345,7 @@ function SyncInternal({
     [mountBounding.x, mountBounding.y, sceneBounding, sceneBox]
   );
 
-  const updatePosition = useCallback(() => {
+  const update = useCallback(() => {
     if (!activeControl.current || !attach.current) return;
 
     const domRect = attach.current.getBoundingClientRect();
@@ -349,6 +362,7 @@ function SyncInternal({
     onLayoutUpdate?.(domRect, { w, h }, { x, y });
 
     if (autoPositioning !== false) {
+      // eslint-disable-next-line react-hooks/immutability
       activeControl.current.position.x = x;
       activeControl.current.position.y = y;
     }
@@ -373,31 +387,30 @@ function SyncInternal({
    * Update position when function changes.
    */
   useLayoutEffect(() => {
-    updatePosition();
-  }, [updatePosition]);
+    update();
+    // eslint-disable-next-line react-hooks/immutability
+    if (manualUpdate) manualUpdate.current = update;
+  }, [update, manualUpdate]);
 
   const mode = {
+    never: null,
     relaxed: weaverContext.lenis ? (
       <RelaxedUpdateLenis
         attach={attach}
-        updatePosition={updatePosition}
+        update={update}
         rootMargin={rootMargin}
       />
     ) : (
       <RelaxedUpdateDom
         attach={attach}
-        updatePosition={updatePosition}
+        update={update}
         rootMargin={rootMargin}
       />
     ),
     balanced: (
-      <BalancedUpdate
-        attach={attach}
-        updatePosition={updatePosition}
-        rootMargin={rootMargin}
-      />
+      <BalancedUpdate attach={attach} update={update} rootMargin={rootMargin} />
     ),
-    aggressive: <AggressiveUpdate updatePosition={updatePosition} />,
+    aggressive: <AggressiveUpdate update={update} />,
   };
 
   if (control) {
@@ -431,10 +444,10 @@ function HudCameraHandler() {
 
 function RelaxedUpdateDom(props: {
   attach: RefObject<HTMLElement | null>;
-  updatePosition: () => void;
+  update: () => void;
   rootMargin?: string;
 }) {
-  const { updatePosition } = props;
+  const { update: updatePosition } = props;
 
   /**
    * Scroll hook to update object correctly to the current HTML scroll position.
@@ -461,10 +474,10 @@ function RelaxedUpdateDom(props: {
 
 function RelaxedUpdateLenis(props: {
   attach: RefObject<HTMLElement | null>;
-  updatePosition: () => void;
+  update: () => void;
   rootMargin?: string;
 }) {
-  const { updatePosition } = props;
+  const { update: updatePosition } = props;
 
   /**
    * Scroll hook to update object correctly to the current HTML scroll position.
@@ -491,7 +504,7 @@ function RelaxedUpdateLenis(props: {
 
 function BalancedUpdate(props: {
   attach: RefObject<HTMLElement | null>;
-  updatePosition: () => void;
+  update: () => void;
   rootMargin?: string;
 }) {
   const [shouldUpdate, setShouldUpdate] = useState(false);
@@ -502,20 +515,20 @@ function BalancedUpdate(props: {
       onIntersect(entry) {
         setShouldUpdate(entry.isIntersecting);
       },
-      onResize: props.updatePosition,
+      onResize: props.update,
     },
     rootMargin: props.rootMargin,
   });
 
   if (shouldUpdate) {
-    return <FrameUseCallback callback={props.updatePosition} />;
+    return <FrameUseCallback callback={props.update} />;
   }
 
   return null;
 }
 
-function AggressiveUpdate(props: { updatePosition: () => void }) {
-  return <FrameUseCallback callback={props.updatePosition} />;
+function AggressiveUpdate(props: { update: () => void }) {
+  return <FrameUseCallback callback={props.update} />;
 }
 
 function FrameUseCallback(props: { callback: () => void }) {
