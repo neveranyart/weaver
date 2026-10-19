@@ -99,7 +99,7 @@ interface SyncProps {
    *
    * The update function reads `getBoundingClientRect`, beware for forced reflow.
    */
-  manualUpdate?: RefObject<() => void>;
+  manualUpdate?: RefObject<(() => void) | null>;
 
   /**
    * Enable/disable automatic scaling on the scene.
